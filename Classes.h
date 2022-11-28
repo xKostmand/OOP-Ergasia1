@@ -13,7 +13,7 @@ class Position{
         void set_x(float x1){
             x=x1;
         }
-        void set_x(float y1){
+        void set_y(float y1){
             y=y1;
         }
         float get_x() const {
@@ -24,8 +24,14 @@ class Position{
         }
 };
 
+class Potion{
+    private:
+        Position position;
+};
+
 class Entity{
-    protected:    
+    protected:
+        string name;    
         Position position;
         int PotionCount;
         //int speed;  ?

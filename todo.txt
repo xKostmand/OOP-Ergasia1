@@ -1,0 +1,8 @@
+map creation/safety measures
+water/trees creation
+werewolves/vampires/potion spawning
+werewolves/vampires moving
+werewolves/vampires interactions
+collision checking
+avatar creation/movement
+day/night cycle
