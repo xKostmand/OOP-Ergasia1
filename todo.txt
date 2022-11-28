@@ -6,3 +6,5 @@ werewolves/vampires interactions
 collision checking
 avatar creation/movement
 day/night cycle
+pause game
+end game
