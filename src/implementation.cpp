@@ -1,5 +1,6 @@
 #include "Classes.h"
 
+
 void CreateWindow(int Width, int Height){
     InitWindow(Width, Height, "Werewolves vs Vampires");
     SetTargetFPS(60);
