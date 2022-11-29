@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../include/Classes.h"
+#include "Classes.h"
 
 using namespace std;
 
