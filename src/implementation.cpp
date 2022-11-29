@@ -8,5 +8,7 @@ void CreateWindow(int Width, int Height){
         BeginDrawing();
         ClearBackground(BLACK);
         DrawText("You created your 1st game.", Width/2, Height/2, 20, WHITE);
+        EndDrawing();
     }
-}
+    CloseWindow();
+    }
