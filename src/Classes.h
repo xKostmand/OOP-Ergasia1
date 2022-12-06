@@ -1,7 +1,9 @@
 #pragma once
 #include <iostream>
 #include <string.h>
+#include <ctime>
 #include "raylib.h"
+#include "raymath.h"
 #include "implementation.h"
 
 using namespace std;
@@ -25,6 +27,20 @@ class Position{
         float get_y() const {
             return y;
         }
+};
+
+class Rec{
+    public:
+        Texture2D texture;
+        Rectangle source;
+        Vector2 position;
+        Color tint;
+};
+
+class TwoTextures{
+    public:
+        Texture2D T1;
+        Texture2D T2;
 };
 
 class Potion{
