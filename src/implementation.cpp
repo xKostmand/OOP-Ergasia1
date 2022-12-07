@@ -8,46 +8,6 @@ TwoTextures LoadTextures(){
     return {WerewolfSprite, VampireSprite};
 }
 
-Rec** LoadEntites(int Width, int Height, Texture2D WT, Texture2D VT){
-    SetRandomSeed(time(NULL));
-    Vector2 WerewolfSpritePosition,VampireSpritePosition;
-    int count=(Width*Height)/(15*21*21);
-    Rec** Recs=new Rec*[count];
-    Rectangle frameRec={0.0f, 0.0f, 21.0f, 21.0f};
-    Rectangle frameRec2={0.0f, 0.0f, 21.0f, 21.0f};
-    for(int i=0;i<count;i++){
-        Recs[i]=new Rec[2];
-        WerewolfSpritePosition={float(GetRandomValue(0, int(Width*30/100))), float(GetRandomValue(0, Height-21))};
-        VampireSpritePosition={float(GetRandomValue(int(Width*70/100), Width-21)), float(GetRandomValue(0, Height-21))};
-        Recs[i][0]={WT, frameRec, WerewolfSpritePosition, WHITE};
-        Recs[i][1]={VT, frameRec2, VampireSpritePosition, WHITE};
-        DrawTextureRec(WT, frameRec, WerewolfSpritePosition, WHITE);
-        DrawTextureRec(VT, frameRec2, VampireSpritePosition, WHITE);
-    }
-    return Recs;
-}
-/*
-void UpdateEntites(Rec** Rectangles, int Width, int Height){
-    int random[2] = {-1,1};
-    int RandIndex = rand()%2;
-    int count=(Width*Height)/(15*21*21);
-    for(int i=0;i<count;i++){
-        Rec* temp=Rectangles[i];
-        temp[0].position.x+= random[RandIndex];
-        temp[0].position.x = Clamp(temp[0].position.x,0,Width-50);
-
-        temp[1].position.x+= random[RandIndex];
-        temp[1].position.x = Clamp(temp[1].position.x,0,Width-50);
-
-        temp[1].position.y+= GetRandomValue(-1,1);
-        temp[1].position.y = Clamp(temp[1].position.y,0,Height-50);
-        
-        DrawTextureRec(temp[0].texture, temp[0].source, temp[0].position, temp[0].tint);
-        DrawTextureRec(temp[1].texture, temp[1].source, temp[1].position, temp[1].tint);
-    }
-}
-*/
-
 bool CheckCollisionsRectangles(Vector2 v1, Vector2 v2){
     bool collision=false;
     if(v1.x<v2.x+21 && v1.x+21>v2.x && v1.y<v2.y+21 && v1.y+21>v2.y)
@@ -87,6 +47,56 @@ bool CheckCollisions(Rec** Rectangles, int number, int count, int type){
     }
     return false;
 }
+
+Rec** LoadEntites(int Width, int Height, Texture2D WT, Texture2D VT){
+    SetRandomSeed(time(NULL));
+    Vector2 WerewolfSpritePosition,VampireSpritePosition;
+    int count=(Width*Height)/(15*21*21);
+    Rec** Recs=new Rec*[count];
+    Rectangle frameRec={0.0f, 0.0f, 21.0f, 21.0f};
+    Rectangle frameRec2={0.0f, 0.0f, 21.0f, 21.0f};
+    for(int i=0;i<count;i++){
+        Recs[i]=new Rec[2];
+        WerewolfSpritePosition={float(GetRandomValue(0, int(Width*30/100))), float(GetRandomValue(0, Height-21))};
+        Recs[i][0]={WT, frameRec, WerewolfSpritePosition, WHITE};
+        while(!CheckCollisions(Recs, i, i, 0)){
+            WerewolfSpritePosition={float(GetRandomValue(0, int(Width*30/100))), float(GetRandomValue(0, Height-21))};
+            Recs[i][0]={WT, frameRec, WerewolfSpritePosition, WHITE};
+        }
+        VampireSpritePosition={float(GetRandomValue(int(Width*70/100), Width-21)), float(GetRandomValue(0, Height-21))};
+        Recs[i][1]={VT, frameRec2, VampireSpritePosition, WHITE};
+        while(!CheckCollisions(Recs, i, i, 1)){
+            VampireSpritePosition={float(GetRandomValue(int(Width*70/100), Width-21)), float(GetRandomValue(0, Height-21))};
+            Recs[i][1]={VT, frameRec2, VampireSpritePosition, WHITE};
+        }
+        Recs[i][0]={WT, frameRec, WerewolfSpritePosition, WHITE};
+        Recs[i][1]={VT, frameRec2, VampireSpritePosition, WHITE};
+        DrawTextureRec(WT, frameRec, WerewolfSpritePosition, WHITE);
+        DrawTextureRec(VT, frameRec2, VampireSpritePosition, WHITE);
+    }
+    return Recs;
+}
+
+/*void UpdateEntites(Rec** Rectangles, int Width, int Height){
+    int random[2] = {-1,1};
+    int RandIndex = rand()%2;
+    int count=(Width*Height)/(15*21*21);
+    for(int i=0;i<count;i++){
+        Rec* temp=Rectangles[i];
+        temp[0].position.x+= random[RandIndex];
+        temp[0].position.x = Clamp(temp[0].position.x,0,Width-50);
+
+        temp[1].position.x+= random[RandIndex];
+        temp[1].position.x = Clamp(temp[1].position.x,0,Width-50);
+
+        temp[1].position.y+= GetRandomValue(-1,1);
+        temp[1].position.y = Clamp(temp[1].position.y,0,Height-50);
+        
+        DrawTextureRec(temp[0].texture, temp[0].source, temp[0].position, temp[0].tint);
+        DrawTextureRec(temp[1].texture, temp[1].source, temp[1].position, temp[1].tint);
+    }
+}
+*/
 
 /*bool CheckCollisions(Rec** Rectangles, int number, int count, int type, Vector2 z){
     Rectangle temp1={z.x, z.y, 21.0f, 21.0f};
