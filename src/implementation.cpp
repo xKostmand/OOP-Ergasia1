@@ -48,31 +48,38 @@ void UpdateEntites(Rec** Rectangles, int Width, int Height){
 }
 */
 
+bool CheckCollisionsRectangles(Vector2 v1, Vector2 v2){
+    bool collision=false;
+    if(v1.x<v2.x+21 && v1.x+21>v2.x && v1.y<v2.y+21 && v1.y+21>v2.y)
+        collision=true;
+    return collision;
+}
+
 bool CheckCollisions(Rec** Rectangles, int number, int count, int type){
     for(int i=0;i<count;i++){
         if(i!=number){
             if(type==0){
-                if(CheckCollisionRecs(Rectangles[number][0].source, Rectangles[i][0].source)){
+                if(CheckCollisionsRectangles(Rectangles[number][0].position, Rectangles[i][0].position)){
                     return true;
                 }
-                if(CheckCollisionRecs(Rectangles[number][0].source, Rectangles[i][1].source)){
+                if(CheckCollisionsRectangles(Rectangles[number][0].position, Rectangles[i][1].position)){
                     return true;
                 }
             }else if(type==1){
-                if(CheckCollisionRecs(Rectangles[number][1].source, Rectangles[i][0].source)){
+                if(CheckCollisionsRectangles(Rectangles[number][1].position, Rectangles[i][0].position)){
                     return true;
                 }
-                if(CheckCollisionRecs(Rectangles[number][1].source, Rectangles[i][1].source)){
+                if(CheckCollisionsRectangles(Rectangles[number][1].position, Rectangles[i][1].position)){
                     return true;
                 }
             }
         }else{
             if(type==0){
-                if(CheckCollisionRecs(Rectangles[number][0].source, Rectangles[i][1].source)){
+                if(CheckCollisionsRectangles(Rectangles[number][0].position, Rectangles[i][1].position)){
                     return true;
                 }
             }else if(type==1){
-                if(CheckCollisionRecs(Rectangles[number][1].source, Rectangles[i][0].source)){
+                if(CheckCollisionsRectangles(Rectangles[number][1].position, Rectangles[i][0].position)){
                     return true;
                 }
             }
@@ -80,6 +87,42 @@ bool CheckCollisions(Rec** Rectangles, int number, int count, int type){
     }
     return false;
 }
+
+/*bool CheckCollisions(Rec** Rectangles, int number, int count, int type, Vector2 z){
+    Rectangle temp1={z.x, z.y, 21.0f, 21.0f};
+    for(int i=0;i<count;i++){
+        Rectangle temp2={Rectangles[i][0].position.x, Rectangles[i][0].position.x, 21.0f, 21.0f};
+        Rectangle temp3={Rectangles[i][1].position.x, Rectangles[i][1].position.x, 21.0f, 21.0f};
+        if(i!=number){
+            if(type==0){
+                if(CheckCollisionRecs(temp1, temp2)){
+                    return true;
+                }
+                if(CheckCollisionRecs(temp1, temp3)){
+                    return true;
+                }
+            }else if(type==1){
+                if(CheckCollisionRecs(temp1, temp2)){
+                    return true;
+                }
+                if(CheckCollisionRecs(temp1, temp3)){
+                    return true;
+                }
+            }
+        }else if(i==number){
+            if(type==0){
+                if(CheckCollisionRecs(temp1, temp3)){
+                    return true;
+                }
+            }else if(type==1){
+                if(CheckCollisionRecs(temp1, temp2)){
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}*/
 
 void UpdateEntities(Rec** Rectangles, int Width, int Height){
     int count=(Width*Height)/(15*21*21);
