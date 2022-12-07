@@ -18,7 +18,8 @@ int main(int argc, char** argv){
         if(strcmp(argv[3], "Vampires") && strcmp(argv[3], "vampires") && strcmp(argv[3], "Werewolves") && strcmp(argv[3], "werewolves")){
             throw argv[3];
         }
-        if(atoi(argv[1])<500 || atoi(argv[1])>1500 || atoi(argv[2])<500 || atoi(argv[2])>1500){
+        if(atoi(argv[1])<400 || atoi(argv[1])>1500 || atoi(argv[2])<400 || atoi(argv[2])>1000){
+            cout<<argv[1];
             Position x(atof(argv[1]), atof(argv[2]));
             throw x;
         }

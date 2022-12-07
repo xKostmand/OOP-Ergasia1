@@ -28,9 +28,20 @@ Rec** LoadEntites(int Width, int Height, Texture2D WT, Texture2D VT){
 }
 
 void UpdateEntites(Rec** Rectangles, int Width, int Height){
+    int random[2] = {-1,1};
+    int RandIndex = rand()%2;
     int count=(Width*Height)/(15*21*21);
     for(int i=0;i<count;i++){
         Rec* temp=Rectangles[i];
+        temp[0].position.x+= random[RandIndex];
+        temp[0].position.x = Clamp(temp[0].position.x,0,Width-50);
+
+        temp[1].position.x+= random[RandIndex];
+        temp[1].position.x = Clamp(temp[1].position.x,0,Width-50);
+
+        temp[1].position.y+= GetRandomValue(-1,1);
+        temp[1].position.y = Clamp(temp[1].position.y,0,Height-50);
+        
         DrawTextureRec(temp[0].texture, temp[0].source, temp[0].position, temp[0].tint);
         DrawTextureRec(temp[1].texture, temp[1].source, temp[1].position, temp[1].tint);
     }
@@ -41,6 +52,13 @@ void CreateWindow(int Width, int Height){
     Rec** Rectangles;
     InitWindow(Width, Height, "Werewolves vs Vampires");
     SetTargetFPS(60);
+    /*int myWidth = GetMonitorWidth(0),myHeight = GetMonitorHeight(0);
+    if(Height < myHeight/4 || Height > myHeight || Width < myWidth/4 || Width > myWidth){
+              CloseWindow();
+        cout << "\n\n\n\nWrong inputs, window size must have scaling : \nWidth : "<<myWidth/4<<" - "<<
+        myWidth<<"\nHeight : " << myHeight/2<<" - "<<myHeight<<"\n";
+        return;
+    }*/
     Texture2D WerewolfTexture, VampireTexture;
     TwoTextures temp=LoadTextures();
     WerewolfTexture=temp.T1;
@@ -51,10 +69,15 @@ void CreateWindow(int Width, int Height){
         if(FirstTime==true){
             Rectangles=LoadEntites(Width, Height, WerewolfTexture, VampireTexture);
             FirstTime=false;
+            int count=(Width*Height)/(15*21*21);
+            for(int i=0;i<count;i++){
+                Rec* temp=Rectangles[i];
+                DrawTextureRec(temp[0].texture, temp[0].source, temp[0].position, temp[0].tint);
+                DrawTextureRec(temp[1].texture, temp[1].source, temp[1].position, temp[1].tint);
+            }
         }
         UpdateEntites(Rectangles, Width, Height);
         EndDrawing();
-        //DrawText("You created your 1st game.", Width/2, Height/2, 20, WHITE);
     }
     CloseWindow();
 }
