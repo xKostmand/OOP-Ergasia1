@@ -26,7 +26,7 @@ Rec** LoadEntites(int Width, int Height, Texture2D WT, Texture2D VT){
     }
     return Recs;
 }
-
+/*
 void UpdateEntites(Rec** Rectangles, int Width, int Height){
     int random[2] = {-1,1};
     int RandIndex = rand()%2;
@@ -44,6 +44,170 @@ void UpdateEntites(Rec** Rectangles, int Width, int Height){
         
         DrawTextureRec(temp[0].texture, temp[0].source, temp[0].position, temp[0].tint);
         DrawTextureRec(temp[1].texture, temp[1].source, temp[1].position, temp[1].tint);
+    }
+}
+*/
+
+bool CheckCollisions(Rec** Rectangles, int number, int count, int type){
+    for(int i=0;i<count;i++){
+        if(i!=number){
+            if(type==0){
+                if(CheckCollisionRecs(Rectangles[number][0].source, Rectangles[i][0].source)){
+                    return true;
+                }
+                if(CheckCollisionRecs(Rectangles[number][0].source, Rectangles[i][1].source)){
+                    return true;
+                }
+            }else if(type==1){
+                if(CheckCollisionRecs(Rectangles[number][1].source, Rectangles[i][0].source)){
+                    return true;
+                }
+                if(CheckCollisionRecs(Rectangles[number][1].source, Rectangles[i][1].source)){
+                    return true;
+                }
+            }
+        }else{
+            if(type==0){
+                if(CheckCollisionRecs(Rectangles[number][0].source, Rectangles[i][1].source)){
+                    return true;
+                }
+            }else if(type==1){
+                if(CheckCollisionRecs(Rectangles[number][1].source, Rectangles[i][0].source)){
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+void UpdateEntities(Rec** Rectangles, int Width, int Height){
+    int count=(Width*Height)/(15*21*21);
+    for(int i=0;i<count;i++){
+        int z1=GetRandomValue(1,4);     //1=move right, 2=move left, 3=move up, 4=move down
+        switch(z1){
+            case 1:
+                Rectangles[i][0].position.x+=5;
+                if(Rectangles[i][0].position.x>Width-21)
+                    Rectangles[i][0].position.x=Width-21;
+                if(CheckCollisions(Rectangles,i,count,0)){
+                    Rectangles[i][0].position.x-=5;
+                }
+                break;
+            case 2:
+                Rectangles[i][0].position.x-=5;
+                if(Rectangles[i][0].position.x<0)
+                    Rectangles[i][0].position.x=0;
+                if(CheckCollisions(Rectangles,i,count,0)){
+                    Rectangles[i][0].position.x+=5;
+                }
+                break;
+            case 3:
+                Rectangles[i][0].position.y+=5;
+                if(Rectangles[i][0].position.y>Height-21)
+                    Rectangles[i][0].position.y=Height-21;
+                if(CheckCollisions(Rectangles,i,count,0)){
+                    Rectangles[i][0].position.y-=5;
+                }
+                break;
+            case 4:
+                Rectangles[i][0].position.y-=5;
+                if(Rectangles[i][0].position.y<0)
+                    Rectangles[i][0].position.y=0;
+                if(CheckCollisions(Rectangles,i,count,0)){
+                    Rectangles[i][0].position.y+=5;
+                }
+                break;
+            default:
+                break;
+        }
+        int z2=GetRandomValue(1,8);     //1=move right, 2=move left, 3=move up, 4=move down, 5=diagonal top right, 6=diagonal bottom right, 7=diagonal bottom left, 8=diagonal top left
+        switch(z2){
+            case 1:
+                Rectangles[i][1].position.x+=5;
+                if(Rectangles[i][1].position.x>Width-21)
+                    Rectangles[i][1].position.x=Width-21;
+                if(CheckCollisions(Rectangles,i,count,1)){
+                    Rectangles[i][1].position.x-=5;
+                }
+                break;
+            case 2:
+                Rectangles[i][1].position.x-=5;
+                if(Rectangles[i][1].position.x<0)
+                    Rectangles[i][1].position.x=0;
+                if(CheckCollisions(Rectangles,i,count,1)){
+                    Rectangles[i][1].position.x+=5;
+                }
+                break;
+            case 3:
+                Rectangles[i][1].position.y+=5;
+                if(Rectangles[i][1].position.y>Height-21)
+                    Rectangles[i][1].position.y=Height-21;
+                if(CheckCollisions(Rectangles,i,count,1)){
+                    Rectangles[i][1].position.y-=5;
+                }
+                break;
+            case 4:
+                Rectangles[i][1].position.y-=5;
+                if(Rectangles[i][1].position.y<0)
+                    Rectangles[i][1].position.y=0;
+                if(CheckCollisions(Rectangles,i,count,1)){
+                    Rectangles[i][1].position.y+=5;
+                }
+                break;
+            case 5:
+                Rectangles[i][1].position.x+=5;
+                Rectangles[i][1].position.y+=5;
+                if(Rectangles[i][1].position.x>Width-21)
+                    Rectangles[i][1].position.x=Width-21;
+                if(Rectangles[i][1].position.y>Height-21)
+                    Rectangles[i][1].position.y=Height-21;
+                if(CheckCollisions(Rectangles,i,count,1)){
+                    Rectangles[i][1].position.x-=5;
+                    Rectangles[i][1].position.y-=5;
+                }
+                break;
+            case 6:
+                Rectangles[i][1].position.x+=5;
+                Rectangles[i][1].position.y-=5;
+                if(Rectangles[i][1].position.x>Width-21)
+                    Rectangles[i][1].position.x=Width-21;
+                if(Rectangles[i][1].position.y<0)
+                    Rectangles[i][1].position.y=0;
+                if(CheckCollisions(Rectangles,i,count,1)){
+                    Rectangles[i][1].position.x-=5;
+                    Rectangles[i][1].position.y+=5;
+                }
+                break;
+            case 7:
+                Rectangles[i][1].position.x-=5;
+                Rectangles[i][1].position.y-=5;
+                if(Rectangles[i][1].position.x<0)
+                    Rectangles[i][1].position.x=0;
+                if(Rectangles[i][1].position.y<0)
+                    Rectangles[i][1].position.y=0;
+                if(CheckCollisions(Rectangles,i,count,1)){
+                    Rectangles[i][1].position.x+=5;
+                    Rectangles[i][1].position.y+=5;
+                }
+                break;
+            case 8:
+                Rectangles[i][1].position.x-=5;
+                Rectangles[i][1].position.y+=5;
+                if(Rectangles[i][1].position.x<0)
+                    Rectangles[i][1].position.x=0;
+                if(Rectangles[i][1].position.y>Height-21)
+                    Rectangles[i][1].position.y=Height-21;
+                if(CheckCollisions(Rectangles,i,count,1)){
+                    Rectangles[i][1].position.x+=5;
+                    Rectangles[i][1].position.y-=5;
+                }
+                break;
+            default:
+                break;
+        }
+        DrawTextureRec(Rectangles[i][0].texture, Rectangles[i][0].source, Rectangles[i][0].position, Rectangles[i][0].tint);
+        DrawTextureRec(Rectangles[i][1].texture, Rectangles[i][1].source, Rectangles[i][1].position, Rectangles[i][1].tint);
     }
 }
 
@@ -76,7 +240,7 @@ void CreateWindow(int Width, int Height){
                 DrawTextureRec(temp[1].texture, temp[1].source, temp[1].position, temp[1].tint);
             }
         }
-        UpdateEntites(Rectangles, Width, Height);
+        UpdateEntities(Rectangles, Width, Height);
         EndDrawing();
     }
     CloseWindow();

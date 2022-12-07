@@ -5,7 +5,7 @@ LDLIBS=-lraylib -lopengl32 -lgdi32 -lwinmm
 
 #add all .o files here
 main: src/main.o src/implementation.o
-		$(CXX) $^ -o $@ $(LDFLAGS) $(LDLIBS)
+		$(CXX) -g3 $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 #add all .o files than need local .h files
 src/implementation.o: src/Classes.h
