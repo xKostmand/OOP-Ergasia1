@@ -1,1 +1,1 @@
-void CreateWindow(int, int);
+void CreateWindow(int, int, const char*);

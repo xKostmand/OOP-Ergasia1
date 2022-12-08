@@ -31,10 +31,39 @@ int main(int argc, char** argv){
         return -1;
     }
     catch(Position x){
-        cout << "\nIncorrect map size. Map should be bigger than 500 and less than 1500 pixels.\nYou gave: " << x.get_x() << " x " << x. get_y() << "\nExiting...\n\n";
+        InitWindow(500, 500, "Error");
+        string posX = to_string((int)x.get_x());
+        string posY = to_string((int)x.get_y());
+        const char* X = posX.c_str();
+        const char* Y = posY.c_str();
+
+        int myWidth = GetMonitorWidth(0),myHeight = GetMonitorHeight(0);
+        SetTargetFPS(60);
+        BeginDrawing();
+        ClearBackground(BLACK);
+        while(!WindowShouldClose()){
+            if(IsKeyPressed(KEY_ESCAPE)){
+                EndDrawing();
+                CloseWindow();
+                return -1;
+            }
+            DrawText("Wrong Dimensions:",150,220,2,WHITE);
+            DrawText(X,250,220,2,RED);
+            DrawText(" - ",270,220,2,RED);
+            DrawText(Y,282,220,2,RED);
+            DrawText("Try something like 750x750",170,250,2,WHITE);
+            EndDrawing();
+        }
+        CloseWindow();
+        cout << "\n\n\n\nWrong inputs,window size must have scaling : \nWidth : "<<myWidth/4<<" - "<<
+        myWidth<<"\nHeight : " << myHeight/2<<" - "<<myHeight<<"\n";
         return -1;
     }
     int WindowWidth=atoi(argv[1]), WindowHeight=atoi(argv[2]);
-    CreateWindow(WindowWidth, WindowHeight);
+    const char* name="Werewolves";
+    if(!strcmp(argv[3], "Vampires") || !strcmp(argv[3], "vampires")){
+        name="Vampires";
+    }
+    CreateWindow(WindowWidth, WindowHeight, name);
     return 0;
 }
