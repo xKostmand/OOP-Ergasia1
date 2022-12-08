@@ -319,8 +319,8 @@ void CreateWindow(int Width, int Height, const char* Team){
         }
         else if(pause){
             DrawText("Game Paused",(Width/2)-70,Height/2,30,WHITE);
-            DrawText("If you want to Continue Press [ENTER]/[P]",5,10,30,WHITE);
-            DrawText("If you want to exit Press [X]",5,40,30,WHITE);
+            DrawText("If you want to Continue Press [ENTER]/[P]",5,10,Width/36,WHITE);
+            DrawText("If you want to exit Press [X]/[ESCAPE]",5,40,Width/36,WHITE);
             if(IsKeyPressed(KEY_ENTER))
                 pause = false;
             if(IsKeyPressed(KEY_X)){

@@ -42,21 +42,18 @@ int main(int argc, char** argv){
         BeginDrawing();
         ClearBackground(BLACK);
         while(!WindowShouldClose()){
-            if(IsKeyPressed(KEY_ESCAPE)){
-                EndDrawing();
-                CloseWindow();
-                return -1;
-            }
-            DrawText("Wrong Dimensions:",150,220,2,WHITE);
-            DrawText(X,250,220,2,RED);
-            DrawText(" - ",270,220,2,RED);
-            DrawText(Y,282,220,2,RED);
-            DrawText("Try something like 750x750",170,250,2,WHITE);
+            DrawText("Wrong Inputs Given for the Window",150,220,2,WHITE);
+            DrawText(X,210,235,2,RED);
+            DrawText(" - ",235,235,2,RED);
+            DrawText(Y,250,235,2,RED);
+            DrawText("Inputs should be between",170,260,2,WHITE);
+            DrawText("Width : 400 - 1500",170,280,2,WHITE);
+            DrawText("Height : 400 - 1000",170,300,2,WHITE);
             EndDrawing();
         }
         CloseWindow();
-        cout << "\n\n\n\nWrong inputs,window size must have scaling : \nWidth : "<<myWidth/4<<" - "<<
-        myWidth<<"\nHeight : " << myHeight/2<<" - "<<myHeight<<"\n";
+        /*cout << "\n\n\n\nWrong inputs,window size must have scaling : \nWidth : "<<myWidth/4<<" - "<<
+        myWidth<<"\nHeight : " << myHeight/2<<" - "<<myHeight<<"\n";*/
         return -1;
     }
     int WindowWidth=atoi(argv[1]), WindowHeight=atoi(argv[2]);
