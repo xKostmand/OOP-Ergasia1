@@ -250,6 +250,25 @@ void MoveVampires(Game State, int Width,int Height, int i, int count){
             break;
     }
 }
+Vector2 UpdateAvatar(Game State, int Width,int Height){  
+    if (IsKeyDown(KEY_RIGHT)){
+        State.avatar.z.x +=5;
+        if(State.avatar.z.x>Width-21)State.avatar.z.x -=5;
+    }
+    if (IsKeyDown(KEY_LEFT)){
+        State.avatar.z.x -= 5;
+        if(State.avatar.z.x<0)State.avatar.z.x +=5;
+    }
+    if (IsKeyDown(KEY_UP)){
+        State.avatar.z.y -= 5;
+        if(State.avatar.z.y<0)State.avatar.z.y +=5;
+    }
+    if (IsKeyDown(KEY_DOWN)){
+        State.avatar.z.y += 5;
+        if(State.avatar.z.y>Height-21)State.avatar.z.y -=5;
+    }
+    return State.avatar.z;
+}
 
 void UpdateEntities(Game State, int Width, int Height){
     int count=(Width*Height)/(15*21*21);
@@ -267,17 +286,19 @@ void EntityInteractions(Game State, int Width, int Height){
 
 }
 
-void PauseGame(int Width, int Height, bool* pause){
+void PauseGame(int Width, int Height, bool* pause,bool* FirstTime){
     DrawText("Game Paused",(Width/2)-70,Height/2,30,WHITE);
     DrawText("If you want to Continue Press [ENTER]/[P]",5,10,Width/36,WHITE);
-    DrawText("If you want to exit Press [X]/[ESCAPE]",5,40,Width/36,WHITE);
-    if(IsKeyPressed(KEY_ENTER)){
-        *pause=false;
-    }
+    DrawText("If you want to Exit Press [X]/[ESCAPE]",5,45,Width/36,WHITE);
+    DrawText("If you want to Restart Press [R]",5,85,Width/36,WHITE);
+    if(IsKeyPressed(KEY_ENTER))*pause = false;
+    if(IsKeyPressed(KEY_R)){
+        *pause = false;
+        *FirstTime = true;
+    }    
     if(IsKeyPressed(KEY_X)){
         EndDrawing(); 
-        CloseWindow();
-        return;   
+        CloseWindow();  
     }
 }
 
@@ -300,12 +321,7 @@ void CreateWindow(int Width, int Height, const char* Team){
             State.Rectangles=LoadEntites(Width, Height, WerewolfTexture, VampireTexture);
             State.avatar=LoadAvatar(Width, Height, AvatarTexture, Team);
             FirstTime=false;
-            int count=(Width*Height)/(15*21*21);/*
-            for(int i=0;i<count;i++){
-                Rec* temp=State.Rectangles[i];
-                DrawTextureRec(temp[0].texture, temp[0].source, temp[0].position, temp[0].tint);
-                DrawTextureRec(temp[1].texture, temp[1].source, temp[1].position, temp[1].tint);
-            }*/
+            int count=(Width*Height)/(15*21*21);
         }
         if(IsKeyPressed(KEY_P)){
             pause = !pause;
@@ -313,9 +329,11 @@ void CreateWindow(int Width, int Height, const char* Team){
         if(!pause){
             DayNightCycle(&time, Width, Height);
             UpdateEntities(State, Width, Height);
+            State.avatar.set_pos(UpdateAvatar(State,Width,Height));
+            DrawTextureRec(State.avatar.texture, {0.0f, 0.0f, 21.0f, 21.0f}, State.avatar.z, WHITE);
             EntityInteractions(State, Width, Height);
         }else{
-            PauseGame(Width, Height, &pause);    
+            PauseGame(Width, Height, &pause,&FirstTime);    
         }
         EndDrawing();
     }
