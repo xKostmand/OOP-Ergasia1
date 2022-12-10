@@ -125,10 +125,12 @@ class Werewolf: public Entity{
         int Damage;
         int Defense;
     public:
-        Werewolf(int HP, int Dmg, int Def){
-            Health=HP;
-            Damage=Dmg;
-            Defense=Def;
+        Werewolf(){
+            name="Werewolf";
+            PotionCount=GetRandomValue(0,2);
+            Health=100;
+            Damage=GetRandomValue(1,3);
+            Defense=GetRandomValue(1,2);
         }
         int get_health(){
             return Health;
@@ -147,10 +149,12 @@ class Vampire: public Entity{
         int Damage;
         int Defense;
     public:
-        Vampire(int HP, int Dmg, int Def){
-            Health=HP;
-            Damage=Dmg;
-            Defense=Def;
+        Vampire(){
+            name="Vampire";
+            PotionCount=GetRandomValue(0,2);
+            Health=100;
+            Damage=GetRandomValue(1,3);
+            Defense=GetRandomValue(1,2);
         }
         int get_health(){
             return Health;
@@ -186,7 +190,13 @@ class Game{
 //        Water water[3];
 //        Tree tree[3];
     public:
-        Game(){}
+        Game(int Width, int Height){
+            int count=(Width*Height)/(15*21*21);
+            Vampire* V=new Vampire[count];
+            Werewolf* W=new Werewolf[count];
+            this->vampire=V;
+            this->werewolf=W;
+        }
 /*        Game(Rec** R, Avatar A, Werewolf* W, Vampire* V, Potion P, Water Wa[3], Tree T[3]):Rectangles(R), avatar(A), werewolf(W), vampire(V), potion(P){
             for(int i=0;i<3;i++){
                 water[i]=Wa[i];

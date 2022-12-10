@@ -1,6 +1,5 @@
 water/trees creation
+potion creation
 werewolves/vampires interactions
-collision checking when spawning
-avatar creation/movement
 pause game
 end game

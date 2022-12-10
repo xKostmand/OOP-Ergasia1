@@ -1,7 +1,5 @@
 #include "Classes.h"
 
-using namespace std;
-
 //argv[1]=WindowWidth
 //argv[2]=WindowHeight
 //argv[3]=Team which user supports. Vampires or Werewolves
