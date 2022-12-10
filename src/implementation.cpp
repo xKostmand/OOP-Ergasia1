@@ -24,43 +24,43 @@ bool CheckCollisionsRectangles(Vector2 v1, Vector2 v2){
     return collision;
 }
 
-bool CheckCollisions(Rec** Rectangles, int number, int count, int type, int CheckWithOther){
+int CheckCollisions(Rec** Rectangles, int number, int count, int type, int CheckWithOther){
     for(int i=0;i<count;i++){
         if(i!=number){
             if(type==0){
                 if(CheckCollisionsRectangles(Rectangles[number][0].position, Rectangles[i][0].position)){
-                    return true;
+                    return 1;
                 }
                 if(CheckWithOther==1){
                     if(CheckCollisionsRectangles(Rectangles[number][0].position, Rectangles[i][1].position)){
-                        return true;
+                        return 2;
                     }
                 }
             }else if(type==1){
                 if(CheckWithOther==1){
                     if(CheckCollisionsRectangles(Rectangles[number][1].position, Rectangles[i][0].position)){
-                        return true;
+                        return 2;
                     }
                 }
                 if(CheckCollisionsRectangles(Rectangles[number][1].position, Rectangles[i][1].position)){
-                    return true;
+                    return 3;
                 }
             }
         }else{
             if(CheckWithOther==1){
                 if(type==0){
                     if(CheckCollisionsRectangles(Rectangles[number][0].position, Rectangles[i][1].position)){
-                        return true;
+                        return 2;
                     }
                 }else if(type==1){
                     if(CheckCollisionsRectangles(Rectangles[number][1].position, Rectangles[i][0].position)){
-                        return true;
+                        return 2;
                     }
                 }
             }
         }
     }
-    return false;
+    return 0;
 }
 
 void DayNightCycle(int* time, int Width, int Height){
@@ -96,12 +96,19 @@ Rec** LoadEntites(int Width, int Height, Texture2D WT, Texture2D VT){
             VampireSpritePosition={float(GetRandomValue(int(Width*70/100), Width-21)), float(GetRandomValue(0, Height-21))};
             Recs[i][1]={VT, frameRec2, VampireSpritePosition, WHITE};
         }
-        Recs[i][0]={WT, frameRec, WerewolfSpritePosition, WHITE};
-        Recs[i][1]={VT, frameRec2, VampireSpritePosition, WHITE};
         DrawTextureRec(WT, frameRec, WerewolfSpritePosition, WHITE);
         DrawTextureRec(VT, frameRec2, VampireSpritePosition, WHITE);
     }
     return Recs;
+}
+
+void DeallocateMem(Game State, int count){
+    for(int i=0; i<count; i++){
+        delete [] State.Rectangles[i];
+    }
+    delete [] State.Rectangles;
+    delete [] State.werewolf;
+    delete [] State.vampire;
 }
 
 Avatar LoadAvatar(int Width, int Height, Texture2D AvatarTexture, const char* Team){
@@ -116,13 +123,14 @@ Avatar LoadAvatar(int Width, int Height, Texture2D AvatarTexture, const char* Te
 }
 
 void MoveWerewolves(Game State, int Width,int Height, int i, int count){
+    int CollisionType;
     int z1=GetRandomValue(1,4);     //1=move right, 2=move left, 3=move up, 4=move down
     switch(z1){
         case 1:
             State.Rectangles[i][0].position.x+=5;
             if(State.Rectangles[i][0].position.x>Width-21)
                 State.Rectangles[i][0].position.x=Width-21;
-            if(CheckCollisions(State.Rectangles,i,count,0,1)){
+            if(CollisionType=CheckCollisions(State.Rectangles,i,count,0,1)){
                 State.Rectangles[i][0].position.x-=5;
             }
             break;
@@ -259,12 +267,25 @@ void EntityInteractions(Game State, int Width, int Height){
 
 }
 
+void PauseGame(int Width, int Height, bool* pause){
+    DrawText("Game Paused",(Width/2)-70,Height/2,30,WHITE);
+    DrawText("If you want to Continue Press [ENTER]/[P]",5,10,Width/36,WHITE);
+    DrawText("If you want to exit Press [X]/[ESCAPE]",5,40,Width/36,WHITE);
+    if(IsKeyPressed(KEY_ENTER)){
+        *pause=false;
+    }
+    if(IsKeyPressed(KEY_X)){
+        EndDrawing(); 
+        CloseWindow();
+        return;   
+    }
+}
+
 void CreateWindow(int Width, int Height, const char* Team){
     int time=0;
     bool pause = false;
     bool FirstTime=true;
     Game State(Width, Height);
-    //State=LoadState();
     InitWindow(Width, Height, "Werewolves vs Vampires");
     SetTargetFPS(60);
     Texture2D WerewolfTexture, VampireTexture, AvatarTexture;
@@ -275,37 +296,29 @@ void CreateWindow(int Width, int Height, const char* Team){
     while(!WindowShouldClose()){
         BeginDrawing();
         ClearBackground(BLACK);
-        DayNightCycle(&time, Width, Height);
         if(FirstTime==true){
             State.Rectangles=LoadEntites(Width, Height, WerewolfTexture, VampireTexture);
             State.avatar=LoadAvatar(Width, Height, AvatarTexture, Team);
             FirstTime=false;
-            int count=(Width*Height)/(15*21*21);
+            int count=(Width*Height)/(15*21*21);/*
             for(int i=0;i<count;i++){
                 Rec* temp=State.Rectangles[i];
                 DrawTextureRec(temp[0].texture, temp[0].source, temp[0].position, temp[0].tint);
                 DrawTextureRec(temp[1].texture, temp[1].source, temp[1].position, temp[1].tint);
-            }
+            }*/
         }
-        if(IsKeyPressed(KEY_P))
+        if(IsKeyPressed(KEY_P)){
             pause = !pause;
+        }
         if(!pause){
+            DayNightCycle(&time, Width, Height);
             UpdateEntities(State, Width, Height);
             EntityInteractions(State, Width, Height);
-        }
-        else if(pause){
-            DrawText("Game Paused",(Width/2)-70,Height/2,30,WHITE);
-            DrawText("If you want to Continue Press [ENTER]/[P]",5,10,Width/36,WHITE);
-            DrawText("If you want to exit Press [X]/[ESCAPE]",5,40,Width/36,WHITE);
-            if(IsKeyPressed(KEY_ENTER))
-                pause = false;
-            if(IsKeyPressed(KEY_X)){
-                EndDrawing(); 
-                CloseWindow();
-                return;   
-            }    
+        }else{
+            PauseGame(Width, Height, &pause);    
         }
         EndDrawing();
     }
     CloseWindow();
+    DeallocateMem(State, (Width*Height)/(15*21*21));
 }
