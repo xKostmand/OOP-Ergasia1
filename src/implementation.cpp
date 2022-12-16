@@ -5,23 +5,34 @@ Textures LoadTextures(const char* Team){
     const char *Vampires="assets/Vampires.png";
     const char *Avatar1="assets/AvatarVamp.png";
     const char *Avatar2="assets/AvatarWere.png";
+    const char *Tree ="assets/Tree.png";
     const char *A;
     Texture2D WerewolfSprite=LoadTexture(Werewolves);
     Texture2D VampireSprite=LoadTexture(Vampires);
+    Texture2D TreeSprite = LoadTexture(Tree);
     if(!strcmp(Team, "Werewolves")){
         A=Avatar2;
     }else{
         A=Avatar1;
     }
     Texture2D AvatarSprite=LoadTexture(A);
-    return {WerewolfSprite, VampireSprite, AvatarSprite};
+    return {WerewolfSprite, VampireSprite,AvatarSprite,TreeSprite };
 }
+
 
 bool CheckCollisionsRectangles(Vector2 v1, Vector2 v2){
     bool collision=false;
     if(v1.x<v2.x+21 && v1.x+21>v2.x && v1.y<v2.y+21 && v1.y+21>v2.y)
         collision=true;
     return collision;
+}
+
+bool CheckCollisionTerrain(Game State,int number, int type,int TreeNum){
+    for(int j = 0 ; j < TreeNum ; j++){
+        if(CheckCollisionsRectangles(State.Rectangles[number][type].position,State.Terrains[j].TerPos))
+            return 1;
+    }
+    return 0;    
 }
 
 int CheckCollisions(Rec** Rectangles, int number, int count, int type, int CheckWithOther){
@@ -109,6 +120,32 @@ void DeallocateMem(Game State, int count){
     delete [] State.Rectangles;
     delete [] State.werewolf;
     delete [] State.vampire;
+    delete [] State.Terrains;
+}
+
+Terrain* LoadTerrain(int Width,int Height,Texture2D TreeTex){
+    Rectangle frameRec={0.0, 0.0, 21.0, 21.0};
+    int count = Height/100;
+    Terrain *T;
+    bool check = false;
+    Vector2 TerPosition;
+    Rectangle RecTable[count];
+    T = new Terrain[count]; 
+    for(int i=0;i<count;i++){
+        T[i].texture = TreeTex;
+        T[i].set_pos({float(GetRandomValue(Width/2-40,Width/2+40)),float(GetRandomValue(50,Height/2))});
+        RecTable[i] = {T[i].TerPos.x,T[i].TerPos.y,21.0,21.0};
+        for(int j = 0 ; j < i ; j++){
+            while(CheckCollisionRecs(RecTable[i],RecTable[j])){
+                T[i].set_pos({float(GetRandomValue(Width/2-40,Width/2+40)),float(GetRandomValue(50,Height/2))});
+                RecTable[i] = {T[i].TerPos.x,T[i].TerPos.y,21.0,21.0};
+            }
+        }
+        T[i].Recta = RecTable[i];
+        DrawTextureRec(T[i].texture,T[i].Recta,T[i].TerPos,WHITE);  
+    }
+    
+    return T;
 }
 
 Avatar LoadAvatar(int Width, int Height, Texture2D AvatarTexture, const char* Team){
@@ -133,12 +170,18 @@ void MoveWerewolves(Game State, int Width,int Height, int i, int count){
             if(CollisionType=CheckCollisions(State.Rectangles,i,count,0,1)){
                 State.Rectangles[i][0].position.x-=5;
             }
+            else if(CheckCollisionTerrain(State,i,0,Height/100)){
+                State.Rectangles[i][0].position.x-=5;
+            }
             break;
         case 2:
             State.Rectangles[i][0].position.x-=5;
             if(State.Rectangles[i][0].position.x<0)
                 State.Rectangles[i][0].position.x=0;
             if(CheckCollisions(State.Rectangles,i,count,0,1)){
+                State.Rectangles[i][0].position.x+=5;
+            }
+            else if(CheckCollisionTerrain(State,i,0,Height/100)){
                 State.Rectangles[i][0].position.x+=5;
             }
             break;
@@ -149,12 +192,18 @@ void MoveWerewolves(Game State, int Width,int Height, int i, int count){
             if(CheckCollisions(State.Rectangles,i,count,0,1)){
                 State.Rectangles[i][0].position.y-=5;
             }
+            else if(CheckCollisionTerrain(State,i,0,Height/100)){
+                State.Rectangles[i][0].position.y-=5;
+            }
             break;
         case 4:
             State.Rectangles[i][0].position.y-=5;
             if(State.Rectangles[i][0].position.y<0)
                 State.Rectangles[i][0].position.y=0;
             if(CheckCollisions(State.Rectangles,i,count,0,1)){
+                State.Rectangles[i][0].position.y+=5;
+            }
+            else if(CheckCollisionTerrain(State,i,0,Height/100)){
                 State.Rectangles[i][0].position.y+=5;
             }
             break;
@@ -173,12 +222,18 @@ void MoveVampires(Game State, int Width,int Height, int i, int count){
             if(CheckCollisions(State.Rectangles,i,count,1,1)){
                 State.Rectangles[i][1].position.x-=5;
             }
+            else if(CheckCollisionTerrain(State,i,1,Height/100)){
+                State.Rectangles[i][1].position.x-=5;
+            }
             break;
         case 2:
             State.Rectangles[i][1].position.x-=5;
             if(State.Rectangles[i][1].position.x<0)
                 State.Rectangles[i][1].position.x=0;
             if(CheckCollisions(State.Rectangles,i,count,1,1)){
+                State.Rectangles[i][1].position.x+=5;
+            }
+            else if(CheckCollisionTerrain(State,i,1,Height/100)){
                 State.Rectangles[i][1].position.x+=5;
             }
             break;
@@ -189,12 +244,18 @@ void MoveVampires(Game State, int Width,int Height, int i, int count){
             if(CheckCollisions(State.Rectangles,i,count,1,1)){
                 State.Rectangles[i][1].position.y-=5;
             }
+            else if(CheckCollisionTerrain(State,i,1,Height/100)){
+                State.Rectangles[i][1].position.x-=5;
+            }
             break;
         case 4:
             State.Rectangles[i][1].position.y-=5;
             if(State.Rectangles[i][1].position.y<0)
                 State.Rectangles[i][1].position.y=0;
             if(CheckCollisions(State.Rectangles,i,count,1,1)){
+                State.Rectangles[i][1].position.y+=5;
+            }
+            else if(CheckCollisionTerrain(State,i,1,Height/100)){
                 State.Rectangles[i][1].position.y+=5;
             }
             break;
@@ -209,6 +270,10 @@ void MoveVampires(Game State, int Width,int Height, int i, int count){
                 State.Rectangles[i][1].position.x-=5;
                 State.Rectangles[i][1].position.y-=5;
             }
+            else if(CheckCollisionTerrain(State,i,1,Height/100)){
+                State.Rectangles[i][1].position.y-=5;
+                State.Rectangles[i][1].position.x-=5;
+            }
             break;
         case 6:
             State.Rectangles[i][1].position.x+=5;
@@ -220,6 +285,10 @@ void MoveVampires(Game State, int Width,int Height, int i, int count){
             if(CheckCollisions(State.Rectangles,i,count,1,1)){
                 State.Rectangles[i][1].position.x-=5;
                 State.Rectangles[i][1].position.y+=5;
+            }
+            else if(CheckCollisionTerrain(State,i,1,Height/100)){
+                State.Rectangles[i][1].position.y+=5;
+                State.Rectangles[i][1].position.x-=5;
             }
             break;
         case 7:
@@ -233,6 +302,10 @@ void MoveVampires(Game State, int Width,int Height, int i, int count){
                 State.Rectangles[i][1].position.x+=5;
                 State.Rectangles[i][1].position.y+=5;
             }
+            else if(CheckCollisionTerrain(State,i,1,Height/100)){
+                State.Rectangles[i][1].position.y+=5;
+                State.Rectangles[i][1].position.x+=5;
+            }
             break;
         case 8:
             State.Rectangles[i][1].position.x-=5;
@@ -242,6 +315,10 @@ void MoveVampires(Game State, int Width,int Height, int i, int count){
             if(State.Rectangles[i][1].position.y>Height-21)
                 State.Rectangles[i][1].position.y=Height-21;
             if(CheckCollisions(State.Rectangles,i,count,1,1)){
+                State.Rectangles[i][1].position.x+=5;
+                State.Rectangles[i][1].position.y-=5;
+            }
+            else if(CheckCollisionTerrain(State,i,1,Height/100)){
                 State.Rectangles[i][1].position.x+=5;
                 State.Rectangles[i][1].position.y-=5;
             }
@@ -270,8 +347,13 @@ Vector2 UpdateAvatar(Game State, int Width,int Height){
     return State.avatar.z;
 }
 
-void UpdateEntities(Game State, int Width, int Height){
+void UpdateEntities(Game State,int Width, int Height){
     int count=(Width*Height)/(15*21*21);
+    for(int i=0;i<Height/100;i++){
+
+        DrawTextureRec(State.Terrains[i].texture,{0.0f, 0.0f, 21.0f, 21.0f},State.Terrains[i].TerPos,WHITE);
+
+    }
     for(int i=0;i<count;i++){
         MoveWerewolves(State, Width, Height, i, count);
         MoveVampires(State, Width, Height, i, count);
@@ -309,15 +391,17 @@ void CreateWindow(int Width, int Height, const char* Team){
     Game State(Width, Height);
     InitWindow(Width, Height, "Werewolves vs Vampires");
     SetTargetFPS(60);
-    Texture2D WerewolfTexture, VampireTexture, AvatarTexture;
+    Texture2D WerewolfTexture, VampireTexture, AvatarTexture,TreeTexture;
     Textures temp=LoadTextures(Team);
     WerewolfTexture=temp.T1;
     VampireTexture=temp.T2;
     AvatarTexture=temp.T3;
+    TreeTexture = temp.T4;
     while(!WindowShouldClose()){
         BeginDrawing();
         ClearBackground(BLACK);
         if(FirstTime==true){
+            State.Terrains = LoadTerrain(Width,Height,TreeTexture);
             State.Rectangles=LoadEntites(Width, Height, WerewolfTexture, VampireTexture);
             State.avatar=LoadAvatar(Width, Height, AvatarTexture, Team);
             FirstTime=false;

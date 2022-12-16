@@ -63,6 +63,7 @@ class Textures{
         Texture2D T1;
         Texture2D T2;
         Texture2D T3;
+        Texture2D T4;
 };
 
 class Potion{
@@ -168,16 +169,26 @@ class Vampire: public Entity{
 };
 
 class Terrain{
-    private:
-        Position position;
     public:
-        Terrain(Position z):position(z){}   //Initialize using Terrain var({x1, x2});
-        Position get_pos(){
-            return position;
+        Texture2D texture;
+        Vector2 TerPos;
+        Rectangle Recta;
+        Color tint;
+        Terrain(){
+            tint = WHITE;
+        }
+        Color GetCol(){return tint;}
+        void SetCol(Color code){tint = code;}
+        Vector2 get_pos(){
+            return TerPos;
+        }
+        void set_pos(Vector2 z1){
+            TerPos=z1;
         }
 };
 
-typedef Terrain Water;
+
+typedef Terrain Lake;
 typedef Terrain Tree;
 
 class Game{
@@ -187,8 +198,8 @@ class Game{
         Werewolf* werewolf;
         Vampire* vampire;
         Potion potion;
-//        Water water[3];
-//        Tree tree[3];
+        // Terrain** Terr;
+        Terrain *Terrains;
     public:
         Game(int Width, int Height){
             int count=(Width*Height)/(15*21*21);
