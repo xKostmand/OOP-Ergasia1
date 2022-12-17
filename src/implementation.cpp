@@ -6,17 +6,19 @@ Textures LoadTextures(const char* Team){
     const char *Avatar1="assets/AvatarVamp.png";
     const char *Avatar2="assets/AvatarWere.png";
     const char *Tree ="assets/Tree.png";
+    const char *Lake ="assets/Lake.png";
     const char *A;
     Texture2D WerewolfSprite=LoadTexture(Werewolves);
     Texture2D VampireSprite=LoadTexture(Vampires);
     Texture2D TreeSprite = LoadTexture(Tree);
+    Texture2D LakeSprite = LoadTexture(Lake);
     if(!strcmp(Team, "Werewolves")){
         A=Avatar2;
     }else{
         A=Avatar1;
     }
     Texture2D AvatarSprite=LoadTexture(A);
-    return {WerewolfSprite, VampireSprite,AvatarSprite,TreeSprite };
+    return {WerewolfSprite, VampireSprite,AvatarSprite,TreeSprite,LakeSprite};
 }
 
 
@@ -35,36 +37,125 @@ bool CheckCollisionTerrain(Game State,int number, int type,int TreeNum){
     return 0;    
 }
 
-int CheckCollisions(Rec** Rectangles, int number, int count, int type, int CheckWithOther){
+void HealTeammate(Game State, int number, int i, int type){
+    if(type==0){
+        if(State.werewolf[i].get_health()!=100){
+            int temp=GetRandomValue(0,1);
+            if(temp==0){
+                return;
+            }else{
+                if(State.werewolf[number].get_pot()!=0){
+                    State.werewolf[number].usepotion();
+                    State.werewolf[i].healup();
+                }
+            }
+        }else if(State.werewolf[number].get_health()!=100){
+            int temp=GetRandomValue(0,1);
+            if(temp==0){
+                return;
+            }else{
+                if(State.werewolf[i].get_pot()!=0){
+                    State.werewolf[i].usepotion();
+                    State.werewolf[number].healup();
+                }
+            }
+        }
+    }else if(type==1){
+        if(State.vampire[i].get_health()!=100){
+            int temp=GetRandomValue(0,1);
+            if(temp==0){
+                return;
+            }else{
+                if(State.vampire[number].get_pot()!=0){
+                    State.vampire[number].usepotion();
+                    State.vampire[i].healup();
+                }
+            }
+        }else if(State.vampire[number].get_health()!=100){
+            int temp=GetRandomValue(0,1);
+            if(temp==0){
+                return;
+            }else{
+                if(State.vampire[i].get_pot()!=0){
+                    State.vampire[i].usepotion();
+                    State.vampire[number].healup();
+                }
+            }
+        }
+    }
+}
+
+void Damage(Game State, int number, int i){
+    float inf=std::numeric_limits<float>::infinity();
+    if(State.werewolf[number].get_damage() >= State.vampire[i].get_damage()){
+        int Damage=State.werewolf[number].get_damage() - State.vampire[i].get_defense();
+        if(Damage<0){
+            Damage=0;
+        }
+        State.vampire[i].set_health(State.vampire[i].get_health() - Damage);
+        if(State.vampire[i].get_health() <= 0){
+            State.Rectangles[i][1].position={inf, inf};
+        }
+    }else{
+        int Damage=State.vampire[i].get_damage() - State.werewolf[number].get_defense();
+        if(Damage<0){
+            Damage=0;
+        }
+        State.werewolf[number].set_health(State.werewolf[number].get_health() - Damage);
+        if(State.werewolf[number].get_health() <= 0){
+            State.Rectangles[number][0].position={-inf, -inf};
+        }
+    }
+}
+
+int CheckCollisions(Game State, int number, int count, int type, int CheckWithOther, int Spawning){
     for(int i=0;i<count;i++){
         if(i!=number){
             if(type==0){
-                if(CheckCollisionsRectangles(Rectangles[number][0].position, Rectangles[i][0].position)){
+                if(CheckCollisionsRectangles(State.Rectangles[number][0].position, State.Rectangles[i][0].position)){
+                    if(!Spawning){
+                        HealTeammate(State, number, i, type);
+                    }
                     return 1;
                 }
                 if(CheckWithOther==1){
-                    if(CheckCollisionsRectangles(Rectangles[number][0].position, Rectangles[i][1].position)){
+                    if(CheckCollisionsRectangles(State.Rectangles[number][0].position, State.Rectangles[i][1].position)){
+                        if(!Spawning){
+                            Damage(State, number, i);
+                        }
                         return 2;
                     }
                 }
             }else if(type==1){
                 if(CheckWithOther==1){
-                    if(CheckCollisionsRectangles(Rectangles[number][1].position, Rectangles[i][0].position)){
+                    if(CheckCollisionsRectangles(State.Rectangles[number][1].position, State.Rectangles[i][0].position)){
+                        if(!Spawning){
+                            Damage(State, i, number);
+                        }
                         return 2;
                     }
                 }
-                if(CheckCollisionsRectangles(Rectangles[number][1].position, Rectangles[i][1].position)){
+                if(CheckCollisionsRectangles(State.Rectangles[number][1].position, State.Rectangles[i][1].position)){
+                    if(!Spawning){
+                        HealTeammate(State, number, i, type);
+                    }
                     return 3;
                 }
             }
         }else{
             if(CheckWithOther==1){
                 if(type==0){
-                    if(CheckCollisionsRectangles(Rectangles[number][0].position, Rectangles[i][1].position)){
+                    if(CheckCollisionsRectangles(State.Rectangles[number][0].position, State.Rectangles[i][1].position)){
+                        if(!Spawning){
+                            Damage(State, number, i);
+                        }
                         return 2;
                     }
                 }else if(type==1){
-                    if(CheckCollisionsRectangles(Rectangles[number][1].position, Rectangles[i][0].position)){
+                    if(CheckCollisionsRectangles(State.Rectangles[number][1].position, State.Rectangles[i][0].position)){
+                        if(!Spawning){
+                            Damage(State, i, number);
+                        }
                         return 2;
                     }
                 }
@@ -90,27 +181,28 @@ Rec** LoadEntites(int Width, int Height, Texture2D WT, Texture2D VT){
     SetRandomSeed(time(NULL));
     Vector2 WerewolfSpritePosition,VampireSpritePosition;
     int count=(Width*Height)/(15*21*21);
-    Rec** Recs=new Rec*[count];
+    Game State;
+    State.Rectangles=new Rec*[count];
     Rectangle frameRec={0.0f, 0.0f, 21.0f, 21.0f};
     Rectangle frameRec2={0.0f, 0.0f, 21.0f, 21.0f};
     for(int i=0;i<count;i++){
-        Recs[i]=new Rec[2];
+        State.Rectangles[i]=new Rec[2];
         WerewolfSpritePosition={float(GetRandomValue(0, int(Width*30/100))), float(GetRandomValue(0, Height-21))};
-        Recs[i][0]={WT, frameRec, WerewolfSpritePosition, WHITE};
-        while(CheckCollisions(Recs, i, i, 0, 0)){
+        State.Rectangles[i][0]={WT, frameRec, WerewolfSpritePosition, WHITE};
+        while(CheckCollisions(State, i, i, 0, 0, 1)){
             WerewolfSpritePosition={float(GetRandomValue(0, int(Width*30/100))), float(GetRandomValue(0, Height-21))};
-            Recs[i][0]={WT, frameRec, WerewolfSpritePosition, WHITE};
+            State.Rectangles[i][0]={WT, frameRec, WerewolfSpritePosition, WHITE};
         }
         VampireSpritePosition={float(GetRandomValue(int(Width*70/100), Width-21)), float(GetRandomValue(0, Height-21))};
-        Recs[i][1]={VT, frameRec2, VampireSpritePosition, WHITE};
-        while(CheckCollisions(Recs, i, i, 1, 0)){
+        State.Rectangles[i][1]={VT, frameRec2, VampireSpritePosition, WHITE};
+        while(CheckCollisions(State, i, i, 1, 0, 1)){
             VampireSpritePosition={float(GetRandomValue(int(Width*70/100), Width-21)), float(GetRandomValue(0, Height-21))};
-            Recs[i][1]={VT, frameRec2, VampireSpritePosition, WHITE};
+            State.Rectangles[i][1]={VT, frameRec2, VampireSpritePosition, WHITE};
         }
         DrawTextureRec(WT, frameRec, WerewolfSpritePosition, WHITE);
         DrawTextureRec(VT, frameRec2, VampireSpritePosition, WHITE);
     }
-    return Recs;
+    return State.Rectangles;
 }
 
 void DeallocateMem(Game State, int count){
@@ -123,17 +215,25 @@ void DeallocateMem(Game State, int count){
     delete [] State.Terrains;
 }
 
-Terrain* LoadTerrain(int Width,int Height,Texture2D TreeTex){
+Terrain* LoadTerrain(int Width,int Height,Texture2D TreeTex,Texture2D LakeTex){
     Rectangle frameRec={0.0, 0.0, 21.0, 21.0};
-    int count = Height/100;
+    int TreeCount;
+    int LakeCount ;
+    int total = 0;
+    if(Height<750){
+        TreeCount = 2;LakeCount = 2;total = 4;
+    }
+    else{
+        TreeCount = 4;LakeCount = 4;total = 8;
+    }
     Terrain *T;
     bool check = false;
     Vector2 TerPosition;
-    Rectangle RecTable[count];
-    T = new Terrain[count]; 
-    for(int i=0;i<count;i++){
+    Rectangle RecTable[total];
+    T = new Terrain[total]; 
+    for(int i=0;i<TreeCount;i++){
         T[i].texture = TreeTex;
-        T[i].set_pos({float(GetRandomValue(Width/2-40,Width/2+40)),float(GetRandomValue(50,Height/2))});
+        T[i].set_pos({float(GetRandomValue(Width/2-25,Width/2+25)),float(GetRandomValue(50,Height/3))});
         RecTable[i] = {T[i].TerPos.x,T[i].TerPos.y,21.0,21.0};
         for(int j = 0 ; j < i ; j++){
             while(CheckCollisionRecs(RecTable[i],RecTable[j])){
@@ -143,6 +243,19 @@ Terrain* LoadTerrain(int Width,int Height,Texture2D TreeTex){
         }
         T[i].Recta = RecTable[i];
         DrawTextureRec(T[i].texture,T[i].Recta,T[i].TerPos,WHITE);  
+    }
+    for(int i=TreeCount;i<total;i++){
+        T[i].texture = LakeTex;
+        T[i].set_pos({float(GetRandomValue(Width/2-25,Width/2+25)),float(GetRandomValue(Height/3,Height/2))});
+        RecTable[i] = {T[i].TerPos.x,T[i].TerPos.y,21.0,21.0};
+        for(int j = 0 ; j < i ; j++){
+            while(CheckCollisionRecs(RecTable[i],RecTable[j])){
+                T[i].set_pos({float(GetRandomValue(Width/2-40,Width/2+40)),float(GetRandomValue(50,Height/2+100))});
+                RecTable[i] = {T[i].TerPos.x,T[i].TerPos.y,21.0,21.0};
+            }
+        }
+        T[i].Recta = RecTable[i];
+        DrawTextureRec(T[i].texture,T[i].Recta,T[i].TerPos,WHITE);
     }
     
     return T;
@@ -167,7 +280,7 @@ void MoveWerewolves(Game State, int Width,int Height, int i, int count){
             State.Rectangles[i][0].position.x+=5;
             if(State.Rectangles[i][0].position.x>Width-21)
                 State.Rectangles[i][0].position.x=Width-21;
-            if(CollisionType=CheckCollisions(State.Rectangles,i,count,0,1)){
+            if(CollisionType=CheckCollisions(State,i,count,0,1,0)){
                 State.Rectangles[i][0].position.x-=5;
             }
             else if(CheckCollisionTerrain(State,i,0,Height/100)){
@@ -178,7 +291,7 @@ void MoveWerewolves(Game State, int Width,int Height, int i, int count){
             State.Rectangles[i][0].position.x-=5;
             if(State.Rectangles[i][0].position.x<0)
                 State.Rectangles[i][0].position.x=0;
-            if(CheckCollisions(State.Rectangles,i,count,0,1)){
+            if(CheckCollisions(State,i,count,0,1,0)){
                 State.Rectangles[i][0].position.x+=5;
             }
             else if(CheckCollisionTerrain(State,i,0,Height/100)){
@@ -189,7 +302,7 @@ void MoveWerewolves(Game State, int Width,int Height, int i, int count){
             State.Rectangles[i][0].position.y+=5;
             if(State.Rectangles[i][0].position.y>Height-21)
                 State.Rectangles[i][0].position.y=Height-21;
-            if(CheckCollisions(State.Rectangles,i,count,0,1)){
+            if(CheckCollisions(State,i,count,0,1,0)){
                 State.Rectangles[i][0].position.y-=5;
             }
             else if(CheckCollisionTerrain(State,i,0,Height/100)){
@@ -200,7 +313,7 @@ void MoveWerewolves(Game State, int Width,int Height, int i, int count){
             State.Rectangles[i][0].position.y-=5;
             if(State.Rectangles[i][0].position.y<0)
                 State.Rectangles[i][0].position.y=0;
-            if(CheckCollisions(State.Rectangles,i,count,0,1)){
+            if(CheckCollisions(State,i,count,0,1,0)){
                 State.Rectangles[i][0].position.y+=5;
             }
             else if(CheckCollisionTerrain(State,i,0,Height/100)){
@@ -219,7 +332,7 @@ void MoveVampires(Game State, int Width,int Height, int i, int count){
             State.Rectangles[i][1].position.x+=5;
             if(State.Rectangles[i][1].position.x>Width-21)
                 State.Rectangles[i][1].position.x=Width-21;
-            if(CheckCollisions(State.Rectangles,i,count,1,1)){
+            if(CheckCollisions(State,i,count,1,1,0)){
                 State.Rectangles[i][1].position.x-=5;
             }
             else if(CheckCollisionTerrain(State,i,1,Height/100)){
@@ -230,7 +343,7 @@ void MoveVampires(Game State, int Width,int Height, int i, int count){
             State.Rectangles[i][1].position.x-=5;
             if(State.Rectangles[i][1].position.x<0)
                 State.Rectangles[i][1].position.x=0;
-            if(CheckCollisions(State.Rectangles,i,count,1,1)){
+            if(CheckCollisions(State,i,count,1,1,0)){
                 State.Rectangles[i][1].position.x+=5;
             }
             else if(CheckCollisionTerrain(State,i,1,Height/100)){
@@ -241,7 +354,7 @@ void MoveVampires(Game State, int Width,int Height, int i, int count){
             State.Rectangles[i][1].position.y+=5;
             if(State.Rectangles[i][1].position.y>Height-21)
                 State.Rectangles[i][1].position.y=Height-21;
-            if(CheckCollisions(State.Rectangles,i,count,1,1)){
+            if(CheckCollisions(State,i,count,1,1,0)){
                 State.Rectangles[i][1].position.y-=5;
             }
             else if(CheckCollisionTerrain(State,i,1,Height/100)){
@@ -252,7 +365,7 @@ void MoveVampires(Game State, int Width,int Height, int i, int count){
             State.Rectangles[i][1].position.y-=5;
             if(State.Rectangles[i][1].position.y<0)
                 State.Rectangles[i][1].position.y=0;
-            if(CheckCollisions(State.Rectangles,i,count,1,1)){
+            if(CheckCollisions(State,i,count,1,1,0)){
                 State.Rectangles[i][1].position.y+=5;
             }
             else if(CheckCollisionTerrain(State,i,1,Height/100)){
@@ -266,7 +379,7 @@ void MoveVampires(Game State, int Width,int Height, int i, int count){
                 State.Rectangles[i][1].position.x=Width-21;
             if(State.Rectangles[i][1].position.y>Height-21)
                 State.Rectangles[i][1].position.y=Height-21;
-            if(CheckCollisions(State.Rectangles,i,count,1,1)){
+            if(CheckCollisions(State,i,count,1,1,0)){
                 State.Rectangles[i][1].position.x-=5;
                 State.Rectangles[i][1].position.y-=5;
             }
@@ -282,7 +395,7 @@ void MoveVampires(Game State, int Width,int Height, int i, int count){
                 State.Rectangles[i][1].position.x=Width-21;
             if(State.Rectangles[i][1].position.y<0)
                 State.Rectangles[i][1].position.y=0;
-            if(CheckCollisions(State.Rectangles,i,count,1,1)){
+            if(CheckCollisions(State,i,count,1,1,0)){
                 State.Rectangles[i][1].position.x-=5;
                 State.Rectangles[i][1].position.y+=5;
             }
@@ -298,7 +411,7 @@ void MoveVampires(Game State, int Width,int Height, int i, int count){
                 State.Rectangles[i][1].position.x=0;
             if(State.Rectangles[i][1].position.y<0)
                 State.Rectangles[i][1].position.y=0;
-            if(CheckCollisions(State.Rectangles,i,count,1,1)){
+            if(CheckCollisions(State,i,count,1,1,0)){
                 State.Rectangles[i][1].position.x+=5;
                 State.Rectangles[i][1].position.y+=5;
             }
@@ -314,13 +427,13 @@ void MoveVampires(Game State, int Width,int Height, int i, int count){
                 State.Rectangles[i][1].position.x=0;
             if(State.Rectangles[i][1].position.y>Height-21)
                 State.Rectangles[i][1].position.y=Height-21;
-            if(CheckCollisions(State.Rectangles,i,count,1,1)){
+            if(CheckCollisions(State,i,count,1,1,0)){
                 State.Rectangles[i][1].position.x+=5;
                 State.Rectangles[i][1].position.y-=5;
             }
             else if(CheckCollisionTerrain(State,i,1,Height/100)){
-                State.Rectangles[i][1].position.x+=5;
-                State.Rectangles[i][1].position.y-=5;
+                State.Rectangles[i][1].position.x+=7;
+                State.Rectangles[i][1].position.y-=7;
             }
             break;
         default:
@@ -359,16 +472,16 @@ void UpdateEntities(Game State,int Width, int Height){
         MoveVampires(State, Width, Height, i, count);
         //MoveAvatar
         DrawTextureRec(State.avatar.texture, {0.0f, 0.0f, 21.0f, 21.0f}, State.avatar.z, WHITE);
-        DrawTextureRec(State.Rectangles[i][0].texture, State.Rectangles[i][0].source, State.Rectangles[i][0].position, State.Rectangles[i][0].tint);
-        DrawTextureRec(State.Rectangles[i][1].texture, State.Rectangles[i][1].source, State.Rectangles[i][1].position, State.Rectangles[i][1].tint);
+        if(State.werewolf[i].get_health()>0){
+            DrawTextureRec(State.Rectangles[i][0].texture, State.Rectangles[i][0].source, State.Rectangles[i][0].position, State.Rectangles[i][0].tint);
+        }
+        if(State.vampire[i].get_health()>0){
+            DrawTextureRec(State.Rectangles[i][1].texture, State.Rectangles[i][1].source, State.Rectangles[i][1].position, State.Rectangles[i][1].tint);
+        }
     }
 }
 
-void EntityInteractions(Game State, int Width, int Height){
-
-}
-
-void PauseGame(int Width, int Height, bool* pause,bool* FirstTime){
+void PauseGame(Game State, int Width, int Height, bool* pause,bool* FirstTime){
     DrawText("Game Paused",(Width/2)-70,Height/2,30,WHITE);
     DrawText("If you want to Continue Press [ENTER]/[P]",5,10,Width/36,WHITE);
     DrawText("If you want to Exit Press [X]/[ESCAPE]",5,45,Width/36,WHITE);
@@ -377,6 +490,11 @@ void PauseGame(int Width, int Height, bool* pause,bool* FirstTime){
     if(IsKeyPressed(KEY_R)){
         *pause = false;
         *FirstTime = true;
+        int count=(Width*Height)/(15*21*21);
+        for(int i=0; i<count; i++){
+            State.vampire[i].set_health(10);
+            State.werewolf[i].set_health(10);
+        }
     }    
     if(IsKeyPressed(KEY_X)){
         EndDrawing(); 
@@ -391,17 +509,18 @@ void CreateWindow(int Width, int Height, const char* Team){
     Game State(Width, Height);
     InitWindow(Width, Height, "Werewolves vs Vampires");
     SetTargetFPS(60);
-    Texture2D WerewolfTexture, VampireTexture, AvatarTexture,TreeTexture;
+    Texture2D WerewolfTexture, VampireTexture, AvatarTexture, TreeTexture, LakeTexture;
     Textures temp=LoadTextures(Team);
     WerewolfTexture=temp.T1;
     VampireTexture=temp.T2;
     AvatarTexture=temp.T3;
     TreeTexture = temp.T4;
+    LakeTexture=temp.T5;
     while(!WindowShouldClose()){
         BeginDrawing();
         ClearBackground(BLACK);
         if(FirstTime==true){
-            State.Terrains = LoadTerrain(Width,Height,TreeTexture);
+            State.Terrains = LoadTerrain(Width,Height,TreeTexture,LakeTexture);
             State.Rectangles=LoadEntites(Width, Height, WerewolfTexture, VampireTexture);
             State.avatar=LoadAvatar(Width, Height, AvatarTexture, Team);
             FirstTime=false;
@@ -415,9 +534,8 @@ void CreateWindow(int Width, int Height, const char* Team){
             UpdateEntities(State, Width, Height);
             State.avatar.set_pos(UpdateAvatar(State,Width,Height));
             DrawTextureRec(State.avatar.texture, {0.0f, 0.0f, 21.0f, 21.0f}, State.avatar.z, WHITE);
-            EntityInteractions(State, Width, Height);
         }else{
-            PauseGame(Width, Height, &pause,&FirstTime);    
+            PauseGame(State, Width, Height, &pause,&FirstTime);    
         }
         EndDrawing();
     }

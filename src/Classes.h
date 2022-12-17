@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string.h>
 #include <ctime>
+#include <limits>
 #include "raylib.h"
 #include "raymath.h"
 #include "implementation.h"
@@ -64,6 +65,7 @@ class Textures{
         Texture2D T2;
         Texture2D T3;
         Texture2D T4;
+        Texture2D T5;
 };
 
 class Potion{
@@ -87,6 +89,9 @@ class Entity{
         }
         int get_pot(){
             return PotionCount;
+        }
+        void usepotion(){
+            PotionCount--;
         }
 };
 
@@ -129,7 +134,7 @@ class Werewolf: public Entity{
         Werewolf(){
             name="Werewolf";
             PotionCount=GetRandomValue(0,2);
-            Health=100;
+            Health=10;
             Damage=GetRandomValue(1,3);
             Defense=GetRandomValue(1,2);
         }
@@ -141,6 +146,12 @@ class Werewolf: public Entity{
         }
         int get_defense(){
             return Defense;
+        }
+        void healup(){
+            Health++;
+        }
+        void set_health(int x){
+            Health=x;
         }
 };
 
@@ -153,7 +164,7 @@ class Vampire: public Entity{
         Vampire(){
             name="Vampire";
             PotionCount=GetRandomValue(0,2);
-            Health=100;
+            Health=10;
             Damage=GetRandomValue(1,3);
             Defense=GetRandomValue(1,2);
         }
@@ -165,6 +176,12 @@ class Vampire: public Entity{
         }
         int get_defense(){
             return Defense;
+        }
+        void healup(){
+            Health++;
+        }
+        void set_health(int x){
+            Health=x;
         }
 };
 
@@ -208,6 +225,7 @@ class Game{
             this->vampire=V;
             this->werewolf=W;
         }
+        Game(){}
 /*        Game(Rec** R, Avatar A, Werewolf* W, Vampire* V, Potion P, Water Wa[3], Tree T[3]):Rectangles(R), avatar(A), werewolf(W), vampire(V), potion(P){
             for(int i=0;i<3;i++){
                 water[i]=Wa[i];
