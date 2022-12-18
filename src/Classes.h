@@ -9,6 +9,8 @@
 
 using namespace std;
 
+#define INF std::numeric_limits<float>::infinity()
+
 class Position{
     private:
         float x;

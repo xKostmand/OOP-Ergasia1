@@ -21,7 +21,6 @@ Textures LoadTextures(const char* Team){
     return {WerewolfSprite, VampireSprite,AvatarSprite,TreeSprite,LakeSprite};
 }
 
-
 bool CheckCollisionsRectangles(Vector2 v1, Vector2 v2){
     bool collision=false;
     if(v1.x<v2.x+21 && v1.x+21>v2.x && v1.y<v2.y+21 && v1.y+21>v2.y)
@@ -86,24 +85,40 @@ void HealTeammate(Game State, int number, int i, int type){
 }
 
 void Damage(Game State, int number, int i){
-    float inf=std::numeric_limits<float>::infinity();
-    if(State.werewolf[number].get_damage() >= State.vampire[i].get_damage()){
+    if(State.werewolf[number].get_damage() > State.vampire[i].get_damage()){
         int Damage=State.werewolf[number].get_damage() - State.vampire[i].get_defense();
         if(Damage<0){
             Damage=0;
         }
         State.vampire[i].set_health(State.vampire[i].get_health() - Damage);
         if(State.vampire[i].get_health() <= 0){
-            State.Rectangles[i][1].position={inf, inf};
+            State.Rectangles[i][1].position={INF, INF};
         }
-    }else{
+    }else if(State.werewolf[number].get_damage() < State.vampire[i].get_damage()){
         int Damage=State.vampire[i].get_damage() - State.werewolf[number].get_defense();
         if(Damage<0){
             Damage=0;
         }
         State.werewolf[number].set_health(State.werewolf[number].get_health() - Damage);
         if(State.werewolf[number].get_health() <= 0){
-            State.Rectangles[number][0].position={-inf, -inf};
+            State.Rectangles[number][0].position={INF/2, INF/2};
+        }
+    }else{
+        int Damage1=State.werewolf[number].get_damage() - State.vampire[i].get_defense();
+        if(Damage1<0){
+            Damage1=0;
+        }
+        State.vampire[i].set_health(State.vampire[i].get_health() - Damage1);
+        if(State.vampire[i].get_health() <= 0){
+            State.Rectangles[i][1].position={INF, INF};
+        }
+        int Damage2=State.vampire[i].get_damage() - State.werewolf[number].get_defense();
+        if(Damage2<0){
+            Damage2=0;
+        }
+        State.werewolf[number].set_health(State.werewolf[number].get_health() - Damage2);
+        if(State.werewolf[number].get_health() <= 0){
+            State.Rectangles[number][0].position={INF/2, INF/2};
         }
     }
 }
@@ -180,7 +195,7 @@ void DayNightCycle(int* time, int Width, int Height){
 Rec** LoadEntites(int Width, int Height, Texture2D WT, Texture2D VT){
     SetRandomSeed(time(NULL));
     Vector2 WerewolfSpritePosition,VampireSpritePosition;
-    int count=(Width*Height)/(15*21*21);
+    int count=(Width*Height)/(20*21*21);
     Game State;
     State.Rectangles=new Rec*[count];
     Rectangle frameRec={0.0f, 0.0f, 21.0f, 21.0f};
@@ -434,8 +449,8 @@ void MoveVampires(Game State, int Width,int Height, int i, int count){
                 State.Rectangles[i][1].position.y-=5;
             }
             else if(CheckCollisionTerrain(State,i,1,TerrainCount)){
-                State.Rectangles[i][1].position.x+=7;
-                State.Rectangles[i][1].position.y-=7;
+                State.Rectangles[i][1].position.x+=10;
+                State.Rectangles[i][1].position.y-=10;
             }
             break;
         default:
@@ -463,7 +478,7 @@ Vector2 UpdateAvatar(Game State, int Width,int Height){
 }
 
 void UpdateEntities(Game State,int Width, int Height){
-    int count=(Width*Height)/(15*21*21);
+    int count=(Width*Height)/(20*21*21);
     int TerrainCount = sizeof(State.Terrains);
     for(int i=0;i<TerrainCount;i++){
 
@@ -493,7 +508,7 @@ void PauseGame(Game State, int Width, int Height, bool* pause,bool* FirstTime){
     if(IsKeyPressed(KEY_R)){
         *pause = false;
         *FirstTime = true;
-        int count=(Width*Height)/(15*21*21);
+        int count=(Width*Height)/(20*21*21);
         for(int i=0; i<count; i++){
             State.vampire[i].set_health(10);
             State.werewolf[i].set_health(10);
@@ -527,7 +542,7 @@ void CreateWindow(int Width, int Height, const char* Team){
             State.Rectangles=LoadEntites(Width, Height, WerewolfTexture, VampireTexture);
             State.avatar=LoadAvatar(Width, Height, AvatarTexture, Team);
             FirstTime=false;
-            int count=(Width*Height)/(15*21*21);
+            int count=(Width*Height)/(20*21*21);
         }
         if(IsKeyPressed(KEY_P)){
             pause = !pause;
@@ -543,5 +558,5 @@ void CreateWindow(int Width, int Height, const char* Team){
         EndDrawing();
     }
     CloseWindow();
-    DeallocateMem(State, (Width*Height)/(15*21*21));
+    DeallocateMem(State, (Width*Height)/(20*21*21));
 }

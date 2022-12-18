@@ -4,7 +4,7 @@
 //argv[2]=WindowHeight
 //argv[3]=Team which user supports. Vampires or Werewolves
 
-//good map size could be 750x750. Entity could be 21x21 pixels(20 pixels=sprite, 1 pixel for collision checking). (750*750/15)/(21*21)=85 entities per team
+//good map size could be 750x750. Entity could be 21x21 pixels(20 pixels=sprite, 1 pixel for collision checking). (750*750/20)/(21*21)=63 entities per team
 
 int main(int argc, char** argv){
     try{
