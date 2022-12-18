@@ -92,6 +92,7 @@ void Damage(Game State, int number, int i){
         }
         State.vampire[i].set_health(State.vampire[i].get_health() - Damage);
         if(State.vampire[i].get_health() <= 0){
+            State.VampCount--;
             State.Rectangles[i][1].position={INF, INF};
         }
     }else if(State.werewolf[number].get_damage() < State.vampire[i].get_damage()){
@@ -101,6 +102,7 @@ void Damage(Game State, int number, int i){
         }
         State.werewolf[number].set_health(State.werewolf[number].get_health() - Damage);
         if(State.werewolf[number].get_health() <= 0){
+            State.WereCount--;
             State.Rectangles[number][0].position={INF/2, INF/2};
         }
     }else{
@@ -110,6 +112,7 @@ void Damage(Game State, int number, int i){
         }
         State.vampire[i].set_health(State.vampire[i].get_health() - Damage1);
         if(State.vampire[i].get_health() <= 0){
+            State.VampCount--;
             State.Rectangles[i][1].position={INF, INF};
         }
         int Damage2=State.vampire[i].get_damage() - State.werewolf[number].get_defense();
@@ -118,6 +121,7 @@ void Damage(Game State, int number, int i){
         }
         State.werewolf[number].set_health(State.werewolf[number].get_health() - Damage2);
         if(State.werewolf[number].get_health() <= 0){
+            State.WereCount--;
             State.Rectangles[number][0].position={INF/2, INF/2};
         }
     }
@@ -548,10 +552,19 @@ void CreateWindow(int Width, int Height, const char* Team){
             pause = !pause;
         }
         if(!pause){
-            DayNightCycle(&time, Width, Height);
-            UpdateEntities(State, Width, Height);
-            State.avatar.set_pos(UpdateAvatar(State,Width,Height));
-            DrawTextureRec(State.avatar.texture, {0.0f, 0.0f, 21.0f, 21.0f}, State.avatar.z, WHITE);
+            if(State.VampCount<=0){
+                DrawText("Game is over!",(Width/2)-70,Height/2,30,RAYWHITE);
+                DrawText("Werewolves have won!",(Width/2)-70,Height/2-30,30,GOLD);
+            }else if(State.WereCount<=0){
+                DrawText("Game is over!",(Width/2)-70,Height/2,30,RAYWHITE);
+                DrawText("Vampires have won!",(Width/2)-70,Height/2-30,30,GOLD);
+            }else{
+                DayNightCycle(&time, Width, Height);
+                UpdateEntities(State, Width, Height);
+                State.avatar.set_pos(UpdateAvatar(State,Width,Height));
+                DrawTextureRec(State.avatar.texture, {0.0f, 0.0f, 21.0f, 21.0f}, State.avatar.z, WHITE);
+                cout << State.WereCount << "\t" << State.VampCount << endl;
+            }
         }else{
             PauseGame(State, Width, Height, &pause,&FirstTime);    
         }

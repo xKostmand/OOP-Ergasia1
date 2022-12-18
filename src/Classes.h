@@ -3,8 +3,8 @@
 #include <string.h>
 #include <ctime>
 #include <limits>
-#include "raylib.h"
-#include "raymath.h"
+#include "../include/raylib.h"
+#include "../include/raymath.h"
 #include "implementation.h"
 
 using namespace std;
@@ -217,21 +217,17 @@ class Game{
         Werewolf* werewolf;
         Vampire* vampire;
         Potion potion;
-        // Terrain** Terr;
         Terrain *Terrains;
+        int* WereCount;
+        int* VampCount;
     public:
         Game(int Width, int Height){
-            int count=(Width*Height)/(15*21*21);
+            int count=(Width*Height)/(20*21*21);
             Vampire* V=new Vampire[count];
             Werewolf* W=new Werewolf[count];
             this->vampire=V;
             this->werewolf=W;
+            *WereCount=*VampCount=count;
         }
         Game(){}
-/*        Game(Rec** R, Avatar A, Werewolf* W, Vampire* V, Potion P, Water Wa[3], Tree T[3]):Rectangles(R), avatar(A), werewolf(W), vampire(V), potion(P){
-            for(int i=0;i<3;i++){
-                water[i]=Wa[i];
-                tree[i]=T[i];
-            }
-        }*/
 };
