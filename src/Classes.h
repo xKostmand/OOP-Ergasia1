@@ -133,12 +133,14 @@ class Werewolf: public Entity{
         int Damage;
         int Defense;
     public:
+        bool isDead;
         Werewolf(){
             name="Werewolf";
             PotionCount=GetRandomValue(0,2);
             Health=10;
             Damage=GetRandomValue(1,3);
             Defense=GetRandomValue(1,2);
+            isDead=false;
         }
         int get_health(){
             return Health;
@@ -163,12 +165,14 @@ class Vampire: public Entity{
         int Damage;
         int Defense;
     public:
+        bool isDead;
         Vampire(){
             name="Vampire";
             PotionCount=GetRandomValue(0,2);
             Health=10;
             Damage=GetRandomValue(1,3);
             Defense=GetRandomValue(1,2);
+            isDead=false;
         }
         int get_health(){
             return Health;

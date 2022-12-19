@@ -1,3 +1,2 @@
 potion creation
 avatar potion usage
-end game
