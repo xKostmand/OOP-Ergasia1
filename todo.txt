@@ -1,5 +1,3 @@
-water/trees creation
 potion creation
-werewolves/vampires interactions
-pause game
+avatar potion usage
 end game

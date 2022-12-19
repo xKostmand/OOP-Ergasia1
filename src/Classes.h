@@ -218,8 +218,8 @@ class Game{
         Vampire* vampire;
         Potion potion;
         Terrain *Terrains;
-        //int* WereCount;
-        //int* VampCount;
+        int WereCount;
+        int VampCount;
     public:
         Game(int Width, int Height){
             int count=(Width*Height)/(20*21*21);
@@ -227,7 +227,8 @@ class Game{
             Werewolf* W=new Werewolf[count];
             this->vampire=V;
             this->werewolf=W;
-            //*WereCount=*VampCount=count;
+            WereCount=count;
+            VampCount=count;
         }
         Game(){}
 };
