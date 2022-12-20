@@ -543,6 +543,7 @@ Vector2 UpdateAvatar(Game State, int Width,int Height,int* PotCount){
         //heal and lower the Avatar's potion counter    
         AOE_HEAL(Width,Height,State,type);
         Sound sound = LoadSound("assets/AOE_Heal.wav");
+        SetSoundVolume(sound , 1.5);
         PlaySound(sound);
         *PotCount = *PotCount - 1;
     }
@@ -579,6 +580,7 @@ void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* Vamp
     else if(*firsttime == 1){
         *PotionCount = 0;*firsttime = 0;*avatarsPot = *avatarsPot + 1;
         Sound sound = LoadSound("assets/PotionPickup.wav");
+        SetSoundVolume(sound , 1.5);
         PlaySound(sound);
     }
  
@@ -615,8 +617,8 @@ void PauseGame(Game State, int Width, int Height, bool* pause,bool* FirstTime,Mu
 }
 
 float VolumeCheck(float volume){
-    if(IsKeyPressed(KEY_DOWN))volume = volume - 0.01;
-    if(IsKeyPressed(KEY_UP))volume = volume + 0.01;
+    if(IsKeyDown(KEY_DOWN))volume = volume - 0.01;
+    if(IsKeyDown(KEY_UP))volume = volume + 0.01;
     if(IsKeyPressed(KEY_M))volume = 0.0;
     return volume;
 }
@@ -632,7 +634,7 @@ void EndGame(int Height,int Width,string winner){
 }
 
 void CreateWindow(int Width, int Height, const char* Team){
-    int time=0;float volume = 0.08;
+    int time=0;float volume = 0.05;
     bool pause = false;
     bool FirstTime=true;
     Game State(Width, Height);
