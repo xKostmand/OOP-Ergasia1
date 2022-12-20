@@ -7,18 +7,20 @@ Textures LoadTextures(const char* Team){
     const char *Avatar2="assets/AvatarWere.png";
     const char *Tree ="assets/Tree.png";
     const char *Lake ="assets/Lake.png";
+    const char *Potion = "assets/Potion.png";
     const char *A;
     Texture2D WerewolfSprite=LoadTexture(Werewolves);
     Texture2D VampireSprite=LoadTexture(Vampires);
     Texture2D TreeSprite = LoadTexture(Tree);
     Texture2D LakeSprite = LoadTexture(Lake);
+    Texture2D PotionSprite = LoadTexture(Potion);
     if(!strcmp(Team, "Werewolves")){
         A=Avatar2;
     }else{
         A=Avatar1;
     }
     Texture2D AvatarSprite=LoadTexture(A);
-    return {WerewolfSprite, VampireSprite,AvatarSprite,TreeSprite,LakeSprite};
+    return {WerewolfSprite, VampireSprite,AvatarSprite,TreeSprite,LakeSprite,PotionSprite};
 }
 
 bool CheckCollisionsRectangles(Vector2 v1, Vector2 v2){
@@ -247,7 +249,7 @@ Terrain* LoadTerrain(int Width,int Height,Texture2D TreeTex,Texture2D LakeTex){
     Terrain *T;
     bool check = false;
     Vector2 TerPosition;
-    T = new Terrain[total];
+    T = new Terrain[total+1];
     for(int i=0;i<TreeCount;i++){
         T[i].texture = TreeTex;
         T[i].set_pos({float(GetRandomValue(0.33*Width,0.55*Width)),float(Height/2-i*50)});
@@ -260,8 +262,26 @@ Terrain* LoadTerrain(int Width,int Height,Texture2D TreeTex,Texture2D LakeTex){
 
         DrawTextureRec(T[i].texture,T[i].Recta,T[i].TerPos,WHITE);
     }
-    
+
+
     return T;
+}
+
+Potion LoadPotion(int Width,int Height,Texture2D PotionTex,Game State){
+    Rectangle frameRec={0.0f, 0.0f, 21.0f, 21.0f};
+    int TerrainCount = sizeof(State.Terrains);
+    Vector2 SpritePosition={float(GetRandomValue(30,Width-30)), float(GetRandomValue(30,Height-30))};
+    Potion P;
+    for(int i = 0;i<TerrainCount;i++){
+        while(CheckCollisionsRectangles(SpritePosition,State.Terrains[i].TerPos) || 
+        CheckCollisionsRectangles(State.avatar.get_pos(),SpritePosition)){
+            SpritePosition = {float(GetRandomValue(30,Width-30)), float(GetRandomValue(30,Height-30))};
+        }
+    }
+    P.set_Tex(PotionTex);
+    P.set_pos(SpritePosition);
+    DrawTextureRec(PotionTex, frameRec, SpritePosition, WHITE);
+    return P;
 }
 
 Avatar LoadAvatar(int Width, int Height, Texture2D AvatarTexture, const char* Team){
@@ -461,8 +481,28 @@ bool CheckAvatarCollisions(Game State, int count){
     return false;
 }
 
-Vector2 UpdateAvatar(Game State, int Width,int Height){
+void AOE_HEAL(int Width,int Height,Game State,int type){
     int count=(Width*Height)/(20*21*21);
+    if(type == 0){
+        for(int i = 0;i<count ;i++){
+            if(State.werewolf[i].get_health()>0){
+                State.werewolf[i].set_health(10);
+            }
+        }
+    }
+    else{
+        for(int i = 0;i<count ;i++){
+            if(State.vampire[i].get_health()>0){
+                State.vampire[i].set_health(10);
+            }
+        }
+    }
+    
+}
+
+Vector2 UpdateAvatar(Game State, int Width,int Height,int* PotCount){
+    int count=(Width*Height)/(20*21*21);
+    int type ;
     if (IsKeyDown(KEY_D)){
         State.avatar.z.x +=4;
         if(State.avatar.z.x>Width-21)
@@ -495,16 +535,25 @@ Vector2 UpdateAvatar(Game State, int Width,int Height){
             State.avatar.z.y -=4;
         }
     }
+    if(IsKeyPressed(KEY_H) && *PotCount>0){
+        if(State.avatar.get_team() == "Werewolves")
+            type = 0;
+        else
+            type = 1;    
+        //heal and lower the Avatar's potion counter    
+        AOE_HEAL(Width,Height,State,type);
+        Sound sound = LoadSound("assets/AOE_Heal.wav");
+        PlaySound(sound);
+        *PotCount = *PotCount - 1;
+    }
     return State.avatar.z;
 }
 
-void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* VampCount){
+void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* VampCount,int* PotionCount,int* firsttime,int* avatarsPot){
     int count=(Width*Height)/(20*21*21);
     int TerrainCount = sizeof(State.Terrains);
     for(int i=0;i<TerrainCount;i++){
-
         DrawTextureRec(State.Terrains[i].texture,{0.0f, 0.0f, 21.0f, 21.0f},State.Terrains[i].TerPos,WHITE);
-
     }
     for(int i=0;i<count;i++){
         MoveWerewolves(State, Width, Height, i, count);
@@ -524,6 +573,15 @@ void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* Vamp
             State.vampire[i].isDead=true;
         }
     }
+    if(!CheckCollisionsRectangles(State.avatar.z,State.potion.get_pos()) && *PotionCount == 1){
+        DrawTextureRec(State.potion.get_Tex(), {0.0f, 0.0f, 21.0f, 21.0f}, State.potion.get_pos(), WHITE);
+    }
+    else if(*firsttime == 1){
+        *PotionCount = 0;*firsttime = 0;*avatarsPot = *avatarsPot + 1;
+        Sound sound = LoadSound("assets/PotionPickup.wav");
+        PlaySound(sound);
+    }
+ 
 }
 
 void PauseGame(Game State, int Width, int Height, bool* pause,bool* FirstTime,Music music){
@@ -548,6 +606,7 @@ void PauseGame(Game State, int Width, int Height, bool* pause,bool* FirstTime,Mu
             State.vampire[i].set_health(10);
             State.werewolf[i].set_health(10);
         }
+        //DeallocateMem(State, (Width*Height)/(20*21*21));
     }    
     if(IsKeyPressed(KEY_X)){
         EndDrawing(); 
@@ -558,18 +617,18 @@ void PauseGame(Game State, int Width, int Height, bool* pause,bool* FirstTime,Mu
 float VolumeCheck(float volume){
     if(IsKeyPressed(KEY_DOWN))volume = volume - 0.01;
     if(IsKeyPressed(KEY_UP))volume = volume + 0.01;
-
+    if(IsKeyPressed(KEY_M))volume = 0.0;
     return volume;
 }
 
 void EndGame(int Height,int Width,string winner){
-    int pos = 0;int var = 0;
-    if(winner == "Werewolves"){pos = (Width/2)-Width*0.25;var = 0.24*Width;}
-    else{pos = (Width/2)-Width*0.2;var = 0.19*Width;}
+    int pos = 0;int var = 0;Color color = WHITE;
+    if(winner == "Werewolves"){pos = (Width/2)-Width*0.25;var = 0.25*Width;color = GOLD;}
+    else{pos = (Width/2)-Width*0.2;var = 0.2*Width;color = PURPLE;}
     const char* Winners = winner.c_str();
     DrawText("Game is over !",(Width/2)-Width*0.13,Height/2,Width/25,RAYWHITE);
-    DrawText(Winners,pos,Height/2-Height*0.1,Width/25,GOLD);
-    DrawText("have Won !",pos+var,Height/2-Height*0.1,Width/25,GOLD);
+    DrawText(Winners,pos,Height/2-Height*0.1,Width/25,color);
+    DrawText("have Won !",pos+var,Height/2-Height*0.1,Width/25,color);
 }
 
 void CreateWindow(int Width, int Height, const char* Team){
@@ -579,7 +638,7 @@ void CreateWindow(int Width, int Height, const char* Team){
     Game State(Width, Height);
     InitWindow(Width, Height, "Werewolves vs Vampires");
     SetTargetFPS(60);
-    Texture2D WerewolfTexture, VampireTexture, AvatarTexture, TreeTexture, LakeTexture;
+    Texture2D WerewolfTexture, VampireTexture, AvatarTexture, TreeTexture, LakeTexture,PotionTexture;
     Textures temp=LoadTextures(Team);
     InitAudioDevice();      // Initialize audio device
     Music music = LoadMusicStream("assets/Music.wav");         // Load WAV audio file
@@ -588,6 +647,7 @@ void CreateWindow(int Width, int Height, const char* Team){
     AvatarTexture=temp.T3;
     TreeTexture = temp.T4;
     LakeTexture=temp.T5;
+    PotionTexture = temp.T6;
     PlayMusicStream(music);
     SetMasterVolume(volume);
     while(!WindowShouldClose()){
@@ -600,8 +660,11 @@ void CreateWindow(int Width, int Height, const char* Team){
             State.Terrains = LoadTerrain(Width,Height,TreeTexture,LakeTexture);
             State.Rectangles=LoadEntites(Width, Height, WerewolfTexture, VampireTexture);
             State.avatar=LoadAvatar(Width, Height, AvatarTexture, Team);
-            FirstTime=false;
+            State.potion = LoadPotion(Width,Height,PotionTexture,State);
+            FirstTime=false;State.firsttime = 1;State.PotionCount = 1;
             int count=(Width*Height)/(20*21*21);
+            State.VampCount=count;
+            State.WereCount=count;
         }
         if(IsKeyPressed(KEY_P) && State.VampCount>0 & State.WereCount>0){
             pause = !pause;
@@ -619,8 +682,8 @@ void CreateWindow(int Width, int Height, const char* Team){
             }else{
                 ResumeMusicStream(music);
                 DayNightCycle(&time, Width, Height);
-                UpdateEntities(State, Width, Height, &(State.WereCount), &(State.VampCount));
-                State.avatar.set_pos(UpdateAvatar(State,Width,Height));
+                State.avatar.set_pos(UpdateAvatar(State,Width,Height,State.avatar.potisource()));
+                UpdateEntities(State, Width, Height, &(State.WereCount), &(State.VampCount),&(State.PotionCount),&(State.firsttime),State.avatar.potisource());
                 DrawTextureRec(State.avatar.texture, {0.0f, 0.0f, 21.0f, 21.0f}, State.avatar.z, WHITE);
             }
         }else{

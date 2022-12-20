@@ -68,16 +68,31 @@ class Textures{
         Texture2D T3;
         Texture2D T4;
         Texture2D T5;
+        Texture2D T6;
 };
 
 class Potion{
     private:
         Position position;
+        Texture2D texture;
     public:
         Potion(){}
         Potion(Position z):position(z){}
-        Position get_pos(){
-            return position;
+        Vector2 get_pos(){
+            Vector2 pos;
+            pos.x = position.get_x();
+            pos.y = position.get_y();
+            return pos;
+        }
+        void set_pos(Vector2 pos){
+            position.set_x(pos.x);
+            position.set_y(pos.y);
+        }
+        void set_Tex(Texture2D tex){
+            texture = tex;
+        }
+        Texture2D get_Tex(){
+            return texture;
         }
 };
 
@@ -86,8 +101,14 @@ class Entity{
         string name;
         int PotionCount;
     public:
+        int* potisource(){
+            return &PotionCount;
+        }
         string get_name(){
             return name;
+        }
+        void set_pot(int count){
+            PotionCount = count;
         }
         int get_pot(){
             return PotionCount;
@@ -95,6 +116,7 @@ class Entity{
         void usepotion(){
             PotionCount--;
         }
+        
 };
 
 class Avatar: public Entity{
@@ -102,10 +124,11 @@ class Avatar: public Entity{
         const char* Team;
         Texture2D texture;
         Vector2 z;
+
     public:
         Avatar(){
             name="Avatar";
-            PotionCount=1;
+            PotionCount = 1;
         }
         string get_team(){
             return Team;
@@ -222,6 +245,7 @@ class Game{
         Vampire* vampire;
         Potion potion;
         Terrain *Terrains;
+        int PotionCount;int firsttime;
         int WereCount;
         int VampCount;
     public:
@@ -233,6 +257,7 @@ class Game{
             this->werewolf=W;
             WereCount=count;
             VampCount=count;
+            PotionCount = 1;
         }
         Game(){}
 };
