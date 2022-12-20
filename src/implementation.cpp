@@ -247,32 +247,27 @@ Terrain* LoadTerrain(int Width,int Height,Texture2D TreeTex,Texture2D LakeTex){
     Terrain *T;
     bool check = false;
     Vector2 TerPosition;
-    Rectangle RecTable[total];
     T = new Terrain[total];
     for(int i=0;i<TreeCount;i++){
         T[i].texture = TreeTex;
-        T[i].set_pos({float(GetRandomValue(Width/2-25,Width/2+25)),float(GetRandomValue(50,Height/3))});
-        RecTable[i] = {T[i].TerPos.x,T[i].TerPos.y,21.0,21.0};
-        for(int j = 0 ; j < i ; j++){
+        T[i].set_pos({float(GetRandomValue(Width/2-25,Width/2+25)),float(Height/2-i*50)});
+        /*for(int j = 0 ; j < i ; j++){
             while(CheckCollisionsRectangles(T[i].TerPos,T[j].TerPos)){
                 T[i].set_pos({float(GetRandomValue(Width/2-25,Width/2+25)),float(GetRandomValue(50,Height/3))});
                 RecTable[i] = {T[i].TerPos.x,T[i].TerPos.y,21.0,21.0};
             }
-        }
-        T[i].Recta = RecTable[i];
+        }*/
         DrawTextureRec(T[i].texture,T[i].Recta,T[i].TerPos,WHITE);  
     }
     for(int i=TreeCount;i<total;i++){
         T[i].texture = LakeTex;
-        T[i].set_pos({float(GetRandomValue(Width/2-25,Width/2+25)),float(GetRandomValue(Height/3,Height/2))});
-        RecTable[i] = {T[i].TerPos.x,T[i].TerPos.y,21.0,21.0};
-        for(int j = 0 ; j < i ; j++){
+        T[i].set_pos({float(GetRandomValue(Width/2-25,Width/2+25)),float(Height/2-i*50)});
+        /*for(int j = 0 ; j < i ; j++){
             while(CheckCollisionsRectangles(T[i].TerPos,T[j].TerPos)){
                 T[i].set_pos({float(GetRandomValue(Width/2-25,Width/2+25)),float(GetRandomValue(Height/3,Height/2))});
                 RecTable[i] = {T[i].TerPos.x,T[i].TerPos.y,21.0,21.0};
             }
-        }
-        T[i].Recta = RecTable[i];
+        }*/
         DrawTextureRec(T[i].texture,T[i].Recta,T[i].TerPos,WHITE);
     }
     
@@ -541,15 +536,23 @@ void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* Vamp
     }
 }
 
-void PauseGame(Game State, int Width, int Height, bool* pause,bool* FirstTime){
-    DrawText("Game Paused",(Width/2)-70,Height/2,30,WHITE);
-    DrawText("If you want to Continue Press [ENTER]/[P]",5,10,Width/36,WHITE);
-    DrawText("If you want to Exit Press [X]/[ESCAPE]",5,45,Width/36,WHITE);
-    DrawText("If you want to Restart Press [R]",5,85,Width/36,WHITE);
+void PauseGame(Game State, int Width, int Height, bool* pause,bool* FirstTime,Music music){
+    string vampcount = to_string((int)State.WereCount);
+    string werecount = to_string((int)State.VampCount);
+    const char* vCount = vampcount.c_str();
+    const char* wCount = werecount.c_str();
+    DrawText("Game Paused",(Width/2)-(Width*0.13),Height/2,Width/25,RED);
+    DrawText("If you want to Continue Press [ENTER]/[P]\nIf you want to Exit Press [X]/[ESCAPE]\nIf you want to Restart Press [R]",5,10,Width/36,WHITE);
+    DrawText(wCount,0.24*Width,0.96*Height,Width/36,GOLD);
+    DrawText("Werewolves left: ",0.0015*Width,0.96*Height,Width/36,GOLD);
+    DrawText(vCount,0.95*Width,0.96*Height,Width/36,PURPLE);
+    DrawText("Vampires left: ",0.75*Width,0.96*Height,Width/36,PURPLE);
     if(IsKeyPressed(KEY_ENTER))*pause = false;
     if(IsKeyPressed(KEY_R)){
         *pause = false;
         *FirstTime = true;
+        StopMusicStream(music);
+        PlayMusicStream(music);
         int count=(Width*Height)/(20*21*21);
         for(int i=0; i<count; i++){
             State.vampire[i].set_health(10);
@@ -562,6 +565,13 @@ void PauseGame(Game State, int Width, int Height, bool* pause,bool* FirstTime){
     }
 }
 
+void EndGame(int Height,int Width,string winner){
+    const char* Winners = winner.c_str();
+    DrawText("Game is over !",(Width/2)-Width*0.13,Height/2,Width/36,RAYWHITE);
+    DrawText(Winners,(Width/2)-Width*0.19,Height/2-30,Width/36,GOLD);
+    DrawText("have Won !",(Width/2)-Width*0.02,Height/2-30,Width/36,GOLD);
+}
+
 void CreateWindow(int Width, int Height, const char* Team){
     int time=0;
     bool pause = false;
@@ -571,14 +581,21 @@ void CreateWindow(int Width, int Height, const char* Team){
     SetTargetFPS(60);
     Texture2D WerewolfTexture, VampireTexture, AvatarTexture, TreeTexture, LakeTexture;
     Textures temp=LoadTextures(Team);
+    InitAudioDevice();      // Initialize audio device
+    Music music = LoadMusicStream("assets/Music.wav");         // Load WAV audio file
     WerewolfTexture=temp.T1;
     VampireTexture=temp.T2;
     AvatarTexture=temp.T3;
     TreeTexture = temp.T4;
     LakeTexture=temp.T5;
+    PlayMusicStream(music);
+    SetMasterVolume(0.08);
     while(!WindowShouldClose()){
         BeginDrawing();
         ClearBackground(BLACK);
+        if(!IsMusicStreamPlaying(music)){
+            PlayMusicStream(music);
+        }
         if(FirstTime==true){
             State.Terrains = LoadTerrain(Width,Height,TreeTexture,LakeTexture);
             State.Rectangles=LoadEntites(Width, Height, WerewolfTexture, VampireTexture);
@@ -586,28 +603,35 @@ void CreateWindow(int Width, int Height, const char* Team){
             FirstTime=false;
             int count=(Width*Height)/(20*21*21);
         }
-        if(IsKeyPressed(KEY_P)){
+        if(IsKeyPressed(KEY_P) && State.VampCount>0 & State.WereCount>0){
             pause = !pause;
         }
-        if(!pause){
-            if(State.VampCount<=0){
-                DrawText("Game is over!",(Width/2)-70,Height/2,30,RAYWHITE);
-                DrawText("Werewolves have won!",(Width/2)-70,Height/2-30,30,GOLD);
-            }else if(State.WereCount<=0){
-                DrawText("Game is over!",(Width/2)-70,Height/2,30,RAYWHITE);
-                DrawText("Vampires have won!",(Width/2)-70,Height/2-30,30,GOLD);
+        if(!pause){            
+            UpdateMusicStream(music); SetMasterVolume(0.08);
+            if(State.VampCount<=0 || State.WereCount<=0 || IsKeyDown(KEY_NINE)){
+                if(State.VampCount<State.WereCount){
+                    EndGame(Height,Width,"Vampires");
+                    StopMusicStream(music);
+                }else{
+                    EndGame(Height,Width,"Werewolves"); 
+                    StopMusicStream(music); 
+                }      
             }else{
+                ResumeMusicStream(music);
                 DayNightCycle(&time, Width, Height);
                 UpdateEntities(State, Width, Height, &(State.WereCount), &(State.VampCount));
                 State.avatar.set_pos(UpdateAvatar(State,Width,Height));
                 DrawTextureRec(State.avatar.texture, {0.0f, 0.0f, 21.0f, 21.0f}, State.avatar.z, WHITE);
-                cout << State.WereCount << "\t" << State.VampCount << endl;
             }
         }else{
-            PauseGame(State, Width, Height, &pause,&FirstTime);    
+            PauseMusicStream(music);
+            PauseGame(State, Width, Height, &pause,&FirstTime,music);    
         }
         EndDrawing();
     }
+    UnloadMusicStream(music);   // Unload music stream buffers from RAM
+    CloseAudioDevice();         // Close audio device (music streaming is automatically stopped)
+    CloseAudioDevice(); 
     CloseWindow();
     DeallocateMem(State, (Width*Height)/(20*21*21));
 }
