@@ -1,13 +1,13 @@
 #include "Classes.h"
 
 Textures LoadTextures(const char* Team){
-    const char *Werewolves="assets/Werewolves.png";
-    const char *Vampires="assets/Vampires.png";
-    const char *Avatar1="assets/AvatarVamp.png";
-    const char *Avatar2="assets/AvatarWere.png";
-    const char *Tree ="assets/Tree.png";
-    const char *Lake ="assets/Lake.png";
-    const char *Potion = "assets/Potion.png";
+    const char *Werewolves="assets/Images/Werewolves.png";
+    const char *Vampires="assets/Images/Vampires.png";
+    const char *Avatar1="assets/Images/AvatarVamp.png";
+    const char *Avatar2="assets/Images/AvatarWere.png";
+    const char *Tree ="assets/Images/Tree.png";
+    const char *Lake ="assets/Images/Lake.png";
+    const char *Potion = "assets/Images/Potion.png";
     const char *A;
     Texture2D WerewolfSprite=LoadTexture(Werewolves);
     Texture2D VampireSprite=LoadTexture(Vampires);
@@ -542,15 +542,15 @@ Vector2 UpdateAvatar(Game State, int Width,int Height,int* PotCount){
             type = 1;    
         //heal and lower the Avatar's potion counter    
         AOE_HEAL(Width,Height,State,type);
-        Sound sound = LoadSound("assets/AOE_Heal.wav");
-        SetSoundVolume(sound , 1.5);
+        Sound sound = LoadSound("assets/Sounds/AOE_Heal.wav");
+        SetSoundVolume(sound , 3.5);
         PlaySound(sound);
         *PotCount = *PotCount - 1;
     }
     return State.avatar.z;
 }
 
-void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* VampCount,int* PotionCount,int* firsttime,int* avatarsPot){
+void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* VampCount,bool* PotionExistance,int* avatarsPot){
     int count=(Width*Height)/(20*21*21);
     int TerrainCount = sizeof(State.Terrains);
     for(int i=0;i<TerrainCount;i++){
@@ -574,14 +574,12 @@ void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* Vamp
             State.vampire[i].isDead=true;
         }
     }
-    if(!CheckCollisionsRectangles(State.avatar.z,State.potion.get_pos()) && *PotionCount == 1){
+    if(!CheckCollisionsRectangles(State.avatar.z,State.potion.get_pos()) && *PotionExistance == true){
         DrawTextureRec(State.potion.get_Tex(), {0.0f, 0.0f, 21.0f, 21.0f}, State.potion.get_pos(), WHITE);
     }
-    else if(*firsttime == 1){
-        *PotionCount = 0;*firsttime = 0;*avatarsPot = *avatarsPot + 1;
-        Sound sound = LoadSound("assets/PotionPickup.wav");
-        SetSoundVolume(sound , 1.5);
-        PlaySound(sound);
+    else{
+        *PotionExistance = false;
+        *avatarsPot = *avatarsPot + 1;
     }
  
 }
@@ -643,7 +641,7 @@ void CreateWindow(int Width, int Height, const char* Team){
     Texture2D WerewolfTexture, VampireTexture, AvatarTexture, TreeTexture, LakeTexture,PotionTexture;
     Textures temp=LoadTextures(Team);
     InitAudioDevice();      // Initialize audio device
-    Music music = LoadMusicStream("assets/Music.wav");         // Load WAV audio file
+    Music music = LoadMusicStream("assets/Sounds/Music.wav");         // Load WAV audio file
     WerewolfTexture=temp.T1;
     VampireTexture=temp.T2;
     AvatarTexture=temp.T3;
@@ -663,7 +661,8 @@ void CreateWindow(int Width, int Height, const char* Team){
             State.Rectangles=LoadEntites(Width, Height, WerewolfTexture, VampireTexture);
             State.avatar=LoadAvatar(Width, Height, AvatarTexture, Team);
             State.potion = LoadPotion(Width,Height,PotionTexture,State);
-            FirstTime=false;State.firsttime = 1;State.PotionCount = 1;
+            FirstTime=false;
+            State.PotionExistance = true;
             int count=(Width*Height)/(20*21*21);
             State.VampCount=count;
             State.WereCount=count;
@@ -685,7 +684,7 @@ void CreateWindow(int Width, int Height, const char* Team){
                 ResumeMusicStream(music);
                 DayNightCycle(&time, Width, Height);
                 State.avatar.set_pos(UpdateAvatar(State,Width,Height,State.avatar.potisource()));
-                UpdateEntities(State, Width, Height, &(State.WereCount), &(State.VampCount),&(State.PotionCount),&(State.firsttime),State.avatar.potisource());
+                UpdateEntities(State, Width, Height, &(State.WereCount), &(State.VampCount),&(State.PotionExistance),State.avatar.potisource());
                 DrawTextureRec(State.avatar.texture, {0.0f, 0.0f, 21.0f, 21.0f}, State.avatar.z, WHITE);
             }
         }else{

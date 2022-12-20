@@ -245,7 +245,7 @@ class Game{
         Vampire* vampire;
         Potion potion;
         Terrain *Terrains;
-        int PotionCount;int firsttime;
+        bool PotionExistance;
         int WereCount;
         int VampCount;
     public:
@@ -257,7 +257,7 @@ class Game{
             this->werewolf=W;
             WereCount=count;
             VampCount=count;
-            PotionCount = 1;
+            PotionExistance=true;
         }
         Game(){}
 };
