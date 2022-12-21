@@ -245,6 +245,7 @@ class Game{
         Vampire* vampire;
         Potion potion;
         Terrain *Terrains;
+        float Speed;
         bool PotionExistance;
         int WereCount;
         int VampCount;

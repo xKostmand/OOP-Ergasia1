@@ -305,47 +305,47 @@ void MoveWerewolves(Game State, int Width,int Height, int i, int count){
     int TerrainCount = sizeof(State.Terrains);
     switch(z1){
         case 1:
-            State.Rectangles[i][0].position.x+=5;
+            State.Rectangles[i][0].position.x+=State.Speed;
             if(State.Rectangles[i][0].position.x>Width-21 && State.Rectangles[i][0].position.x<Width+100)
                 State.Rectangles[i][0].position.x=Width-21;
             if(CheckCollisions(State,i,count,0,1,0)){
-                State.Rectangles[i][0].position.x-=5;
+                State.Rectangles[i][0].position.x-=State.Speed;
             }
             else if(CheckCollisionTerrain(State,i,0,TerrainCount)){
-                State.Rectangles[i][0].position.x-=5;
+                State.Rectangles[i][0].position.x-=State.Speed;
             }
             break;
         case 2:
-            State.Rectangles[i][0].position.x-=5;
+            State.Rectangles[i][0].position.x-=State.Speed;
             if(State.Rectangles[i][0].position.x<0)
                 State.Rectangles[i][0].position.x=0;
             if(CheckCollisions(State,i,count,0,1,0)){
-                State.Rectangles[i][0].position.x+=5;
+                State.Rectangles[i][0].position.x+=State.Speed;
             }
             else if(CheckCollisionTerrain(State,i,0,TerrainCount)){
-                State.Rectangles[i][0].position.x+=5;
+                State.Rectangles[i][0].position.x+=State.Speed;
             }
             break;
         case 3:
-            State.Rectangles[i][0].position.y+=5;
+            State.Rectangles[i][0].position.y+=State.Speed;
             if(State.Rectangles[i][0].position.y>Height-21 && State.Rectangles[i][0].position.y<Width+100)
                 State.Rectangles[i][0].position.y=Height-21;
             if(CheckCollisions(State,i,count,0,1,0)){
-                State.Rectangles[i][0].position.y-=5;
+                State.Rectangles[i][0].position.y-=State.Speed;
             }
             else if(CheckCollisionTerrain(State,i,0,TerrainCount)){
-                State.Rectangles[i][0].position.y-=5;
+                State.Rectangles[i][0].position.y-=State.Speed;
             }
             break;
         case 4:
-            State.Rectangles[i][0].position.y-=5;
+            State.Rectangles[i][0].position.y-=State.Speed;
             if(State.Rectangles[i][0].position.y<0)
                 State.Rectangles[i][0].position.y=0;
             if(CheckCollisions(State,i,count,0,1,0)){
-                State.Rectangles[i][0].position.y+=5;
+                State.Rectangles[i][0].position.y+=State.Speed;
             }
             else if(CheckCollisionTerrain(State,i,0,TerrainCount)){
-                State.Rectangles[i][0].position.y+=5;
+                State.Rectangles[i][0].position.y+=State.Speed;
             }
             break;
         default:
@@ -358,111 +358,111 @@ void MoveVampires(Game State, int Width,int Height, int i, int count){
     int TerrainCount = sizeof(State.Terrains);
     switch(z2){
         case 1:
-            State.Rectangles[i][1].position.x+=5;
+            State.Rectangles[i][1].position.x+=State.Speed;
             if(State.Rectangles[i][1].position.x>Width-21 && State.Rectangles[i][1].position.x<Width+100)
                 State.Rectangles[i][1].position.x=Width-21;
             if(CheckCollisions(State,i,count,1,1,0)){
-                State.Rectangles[i][1].position.x-=5;
+                State.Rectangles[i][1].position.x-=State.Speed;
             }
             else if(CheckCollisionTerrain(State,i,1,TerrainCount)){
-                State.Rectangles[i][1].position.x-=5;
+                State.Rectangles[i][1].position.x-=State.Speed;
             }
             break;
         case 2:
-            State.Rectangles[i][1].position.x-=5;
+            State.Rectangles[i][1].position.x-=State.Speed;
             if(State.Rectangles[i][1].position.x<0)
                 State.Rectangles[i][1].position.x=0;
             if(CheckCollisions(State,i,count,1,1,0)){
-                State.Rectangles[i][1].position.x+=5;
+                State.Rectangles[i][1].position.x+=State.Speed;
             }
             else if(CheckCollisionTerrain(State,i,1,TerrainCount)){
-                State.Rectangles[i][1].position.x+=5;
+                State.Rectangles[i][1].position.x+=State.Speed;
             }
             break;
         case 3:
-            State.Rectangles[i][1].position.y+=5;
+            State.Rectangles[i][1].position.y+=State.Speed;
             if(State.Rectangles[i][1].position.y>Height-21 && State.Rectangles[i][1].position.y<Width+100)
                 State.Rectangles[i][1].position.y=Height-21;
             if(CheckCollisions(State,i,count,1,1,0)){
-                State.Rectangles[i][1].position.y-=5;
+                State.Rectangles[i][1].position.y-=State.Speed;
             }
             else if(CheckCollisionTerrain(State,i,1,TerrainCount)){
-                State.Rectangles[i][1].position.x-=5;
+                State.Rectangles[i][1].position.x-=State.Speed;
             }
             break;
         case 4:
-            State.Rectangles[i][1].position.y-=5;
+            State.Rectangles[i][1].position.y-=State.Speed;
             if(State.Rectangles[i][1].position.y<0)
                 State.Rectangles[i][1].position.y=0;
             if(CheckCollisions(State,i,count,1,1,0)){
-                State.Rectangles[i][1].position.y+=5;
+                State.Rectangles[i][1].position.y+=State.Speed;
             }
             else if(CheckCollisionTerrain(State,i,1,TerrainCount)){
-                State.Rectangles[i][1].position.y+=5;
+                State.Rectangles[i][1].position.y+=State.Speed;
             }
             break;
         case 5:
-            State.Rectangles[i][1].position.x+=5;
-            State.Rectangles[i][1].position.y+=5;
+            State.Rectangles[i][1].position.x+=State.Speed;
+            State.Rectangles[i][1].position.y+=State.Speed;
             if(State.Rectangles[i][1].position.x>Width-21 && State.Rectangles[i][1].position.x<Width+100)
                 State.Rectangles[i][1].position.x=Width-21;
             if(State.Rectangles[i][1].position.y>Height-21 && State.Rectangles[i][1].position.y<Width+100)
                 State.Rectangles[i][1].position.y=Height-21;
             if(CheckCollisions(State,i,count,1,1,0)){
-                State.Rectangles[i][1].position.x-=5;
-                State.Rectangles[i][1].position.y-=5;
+                State.Rectangles[i][1].position.x-=State.Speed;
+                State.Rectangles[i][1].position.y-=State.Speed;
             }
             else if(CheckCollisionTerrain(State,i,1,TerrainCount)){
-                State.Rectangles[i][1].position.y-=5;
-                State.Rectangles[i][1].position.x-=5;
+                State.Rectangles[i][1].position.y-=State.Speed;
+                State.Rectangles[i][1].position.x-=State.Speed;
             }
             break;
         case 6:
-            State.Rectangles[i][1].position.x+=5;
-            State.Rectangles[i][1].position.y-=5;
+            State.Rectangles[i][1].position.x+=State.Speed;
+            State.Rectangles[i][1].position.y-=State.Speed;
             if(State.Rectangles[i][1].position.x>Width-21 && State.Rectangles[i][1].position.x<Width+100)
                 State.Rectangles[i][1].position.x=Width-21;
             if(State.Rectangles[i][1].position.y<0)
                 State.Rectangles[i][1].position.y=0;
             if(CheckCollisions(State,i,count,1,1,0)){
-                State.Rectangles[i][1].position.x-=5;
-                State.Rectangles[i][1].position.y+=5;
+                State.Rectangles[i][1].position.x-=State.Speed;
+                State.Rectangles[i][1].position.y+=State.Speed;
             }
             else if(CheckCollisionTerrain(State,i,1,TerrainCount)){
-                State.Rectangles[i][1].position.y+=5;
-                State.Rectangles[i][1].position.x-=5;
+                State.Rectangles[i][1].position.y+=State.Speed;
+                State.Rectangles[i][1].position.x-=State.Speed;
             }
             break;
         case 7:
-            State.Rectangles[i][1].position.x-=5;
-            State.Rectangles[i][1].position.y-=5;
+            State.Rectangles[i][1].position.x-=State.Speed;
+            State.Rectangles[i][1].position.y-=State.Speed;
             if(State.Rectangles[i][1].position.x<0)
                 State.Rectangles[i][1].position.x=0;
             if(State.Rectangles[i][1].position.y<0)
                 State.Rectangles[i][1].position.y=0;
             if(CheckCollisions(State,i,count,1,1,0)){
-                State.Rectangles[i][1].position.x+=5;
-                State.Rectangles[i][1].position.y+=5;
+                State.Rectangles[i][1].position.x+=State.Speed;
+                State.Rectangles[i][1].position.y+=State.Speed;
             }
             else if(CheckCollisionTerrain(State,i,1,TerrainCount)){
-                State.Rectangles[i][1].position.y+=5;
-                State.Rectangles[i][1].position.x+=5;
+                State.Rectangles[i][1].position.y+=State.Speed;
+                State.Rectangles[i][1].position.x+=State.Speed;
             }
             break;
         case 8:
-            State.Rectangles[i][1].position.x-=5;
-            State.Rectangles[i][1].position.y+=5;
+            State.Rectangles[i][1].position.x-=State.Speed;
+            State.Rectangles[i][1].position.y+=State.Speed;
             if(State.Rectangles[i][1].position.x<0)
                 State.Rectangles[i][1].position.x=0;
             if(State.Rectangles[i][1].position.y>Height-21 && State.Rectangles[i][1].position.y<Width+100)
                 State.Rectangles[i][1].position.y=Height-21;
             if(CheckCollisions(State,i,count,1,1,0)){
-                State.Rectangles[i][1].position.x+=5;
-                State.Rectangles[i][1].position.y-=5;
+                State.Rectangles[i][1].position.x+=State.Speed;
+                State.Rectangles[i][1].position.y-=State.Speed;
             }
             else if(CheckCollisionTerrain(State,i,1,TerrainCount)){
-                State.Rectangles[i][1].position.x+=10;
-                State.Rectangles[i][1].position.y-=10;
+                State.Rectangles[i][1].position.x+=State.Speed*2;
+                State.Rectangles[i][1].position.y-=State.Speed*2;
             }
             break;
         default:
@@ -504,39 +504,39 @@ void AOE_HEAL(int Width,int Height,Game State,int type){
     
 }
 
-Vector2 UpdateAvatar(Game State, int Width,int Height,int* PotCount){
+Vector2 UpdateAvatar(Game State, int Width,int Height,int* PotCount,float* Speed,Sound Heal){
     int count=(Width*Height)/(20*21*21);
     int type ;
     if (IsKeyDown(KEY_D)){
-        State.avatar.z.x +=4;
+        State.avatar.z.x +=State.Speed/2;
         if(State.avatar.z.x>Width-21)
-            State.avatar.z.x -=4;
+            State.avatar.z.x -=State.Speed/2;
         if(CheckAvatarCollisions(State,count)){
-            State.avatar.z.x -=4;
+            State.avatar.z.x -=State.Speed/2;
         }
     }
     if (IsKeyDown(KEY_A)){
-        State.avatar.z.x -=4;
+        State.avatar.z.x -=State.Speed/2;
         if(State.avatar.z.x<0)
-            State.avatar.z.x +=4;
+            State.avatar.z.x +=State.Speed/2;
         if(CheckAvatarCollisions(State,count)){
-            State.avatar.z.x +=4;
+            State.avatar.z.x +=State.Speed/2;
         }
     }
     if (IsKeyDown(KEY_W)){
-        State.avatar.z.y -= 4;
+        State.avatar.z.y -= State.Speed/2;
         if(State.avatar.z.y<0)
-            State.avatar.z.y +=4;
+            State.avatar.z.y +=State.Speed/2;
         if(CheckAvatarCollisions(State,count)){
-            State.avatar.z.y +=4;
+            State.avatar.z.y +=State.Speed/2;
         }
     }
     if (IsKeyDown(KEY_S)){
-        State.avatar.z.y += 4;
+        State.avatar.z.y += State.Speed/2;
         if(State.avatar.z.y>Height-21)
-            State.avatar.z.y -=4;
+            State.avatar.z.y -=State.Speed/2;
         if(CheckAvatarCollisions(State,count)){
-            State.avatar.z.y -=4;
+            State.avatar.z.y -=State.Speed/2;
         }
     }
     if(IsKeyPressed(KEY_H) && *PotCount>0){
@@ -546,15 +546,19 @@ Vector2 UpdateAvatar(Game State, int Width,int Height,int* PotCount){
             type = 1;    
         //heal and lower the Avatar's potion counter    
         AOE_HEAL(Width,Height,State,type);
-        Sound sound = LoadSound("assets/Sounds/AOE_Heal.wav");
-        SetSoundVolume(sound , 3.5);
-        PlaySound(sound);
+        SetSoundVolume(Heal , 3.5);
+        PlaySound(Heal);
         *PotCount = *PotCount - 1;
     }
+    if(IsKeyPressed(KEY_PAGE_UP) && State.Speed < 9.5)
+        *Speed += 1.0;
+    if(IsKeyPressed(KEY_PAGE_DOWN) && State.Speed > 1.5)
+        *Speed -= 1.0;
+
     return State.avatar.z;
 }
 
-void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* VampCount,bool* PotionExistance,int* avatarsPot){
+void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* VampCount,bool* PotionExistance,int* avatarsPot,Sound Pickup){
     int count=(Width*Height)/(20*21*21);
     int TerrainCount = sizeof(State.Terrains);
     for(int i=0;i<TerrainCount;i++){
@@ -582,9 +586,11 @@ void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* Vamp
     }
     else{
         if(*avatarsPot == 1 && *PotionExistance == true){
+            PlaySound(Pickup);
             *PotionExistance = false;
             *avatarsPot = 2;
         }else if(*avatarsPot == 0 && *PotionExistance == true){
+            PlaySound(Pickup);
             *PotionExistance = false;
             *avatarsPot = 1;
         }
@@ -595,14 +601,18 @@ void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* Vamp
 void PauseGame(Game State, int Width, int Height, bool* pause,bool* FirstTime,Music music){
     string werecount = to_string((int)State.WereCount);
     string vampcount = to_string((int)State.VampCount);
-    const char* vCount = vampcount.c_str();
+    string potionCount = to_string((int)State.avatar.get_pot());
     const char* wCount = werecount.c_str();
+    const char* vCount = vampcount.c_str();
+    const char* pCount = potionCount.c_str();
     DrawText("Game Paused",(Width/2)-(Width*0.13),Height/2,Width/25,RED);
     DrawText("If you want to Continue Press [ENTER]/[P]\nIf you want to Exit Press [X]/[ESCAPE]\nIf you want to Restart Press [R]",5,10,Width/36,WHITE);
     DrawText(wCount,0.25*Width,0.96*Height,Width/36,GOLD);
     DrawText("Werewolves left: ",0.012*Width,0.96*Height,Width/36,GOLD);
     DrawText(vCount,0.95*Width,0.96*Height,Width/36,PURPLE);
     DrawText("Vampires left: ",0.75*Width,0.96*Height,Width/36,PURPLE);
+    DrawText("Potions Left: ",0.41*Width,0.96*Height,Width/36,RED);
+    DrawText(pCount,0.6*Width,0.96*Height,Width/36,RED);
     if(IsKeyPressed(KEY_ENTER))*pause = false;
     if(IsKeyPressed(KEY_R)){
         *pause = false;
@@ -614,7 +624,7 @@ void PauseGame(Game State, int Width, int Height, bool* pause,bool* FirstTime,Mu
             State.vampire[i].set_health(10);
             State.werewolf[i].set_health(10);
         }
-        //DeallocateMem(State, (Width*Height)/(20*21*21));
+
     }    
     if(IsKeyPressed(KEY_X)){
         EndDrawing(); 
@@ -650,6 +660,8 @@ void CreateWindow(int Width, int Height, const char* Team){
     Textures temp=LoadTextures(Team);
     InitAudioDevice();      // Initialize audio device
     Music music = LoadMusicStream("assets/Sounds/Music.wav");         // Load WAV audio file
+    Sound PotionSound = LoadSound("assets/Sounds/PotionPickup.wav");
+    Sound HealSound = LoadSound("assets/Sounds/AOE_Heal.wav");
     WerewolfTexture=temp.T1;
     VampireTexture=temp.T2;
     AvatarTexture=temp.T3;
@@ -669,8 +681,8 @@ void CreateWindow(int Width, int Height, const char* Team){
             State.Terrains = LoadTerrain(Width,Height,TreeTexture,LakeTexture,State.potion.get_pos());
             State.Rectangles=LoadEntites(Width, Height, WerewolfTexture, VampireTexture);
             State.avatar=LoadAvatar(Width, Height, AvatarTexture, Team);
-            FirstTime=false;
             State.PotionExistance = true;
+            State.Speed = 3.0;
             int count=(Width*Height)/(20*21*21);
             State.VampCount=count;
             State.WereCount=count;
@@ -678,6 +690,7 @@ void CreateWindow(int Width, int Height, const char* Team){
                 State.werewolf[i].isDead=false;
                 State.vampire[i].isDead=false;
             }
+            FirstTime=false;
         }
         if(IsKeyPressed(KEY_P) && State.VampCount>0 & State.WereCount>0){
             pause = !pause;
@@ -691,12 +704,22 @@ void CreateWindow(int Width, int Height, const char* Team){
                 }else{
                     EndGame(Height,Width,"Werewolves"); 
                     StopMusicStream(music); 
-                }      
+                }
+                if(IsKeyPressed(KEY_R)){
+                    FirstTime = true;
+                    StopMusicStream(music);
+                    PlayMusicStream(music);
+                    int count=(Width*Height)/(20*21*21);
+                    for(int i=0; i<count; i++){
+                        State.vampire[i].set_health(10);
+                        State.werewolf[i].set_health(10);
+                    }
+                }       
             }else{
                 ResumeMusicStream(music);
                 DayNightCycle(&time, Width, Height);
-                State.avatar.set_pos(UpdateAvatar(State,Width,Height,State.avatar.potisource()));
-                UpdateEntities(State, Width, Height, &(State.WereCount), &(State.VampCount),&(State.PotionExistance),State.avatar.potisource());
+                State.avatar.set_pos(UpdateAvatar(State,Width,Height,State.avatar.potisource(),&(State.Speed),HealSound));
+                UpdateEntities(State, Width, Height, &(State.WereCount), &(State.VampCount),&(State.PotionExistance),State.avatar.potisource(),PotionSound);
                 DrawTextureRec(State.avatar.texture, {0.0f, 0.0f, 21.0f, 21.0f}, State.avatar.z, WHITE);
             }
         }else{
