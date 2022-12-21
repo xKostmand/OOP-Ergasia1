@@ -1,2 +1,3 @@
-potion creation
-avatar potion usage
+Clean up (Better file arrangement,function calls)
+BUG fixes 
+Presentation
