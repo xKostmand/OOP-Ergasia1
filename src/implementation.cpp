@@ -34,6 +34,8 @@ bool CheckCollisionTerrain(Game State,int number, int type,int TreeNum){
     for(int j = 0 ; j < TreeNum ; j++){
         if(CheckCollisionsRectangles(State.Rectangles[number][type].position,State.Terrains[j].TerPos))
             return true;
+        if(CheckCollisionsRectangles(State.Rectangles[number][type].position,State.potion.get_pos()))
+            return true;
     }
     return false;    
 }
@@ -235,7 +237,7 @@ void DeallocateMem(Game State, int count){
     delete [] State.Terrains;
 }
 
-Terrain* LoadTerrain(int Width,int Height,Texture2D TreeTex,Texture2D LakeTex){
+Terrain* LoadTerrain(int Width,int Height,Texture2D TreeTex,Texture2D LakeTex, Vector2 PotPosition){
     Rectangle frameRec={0.0, 0.0, 21.0, 21.0};
     int TreeCount;
     int LakeCount;
@@ -252,14 +254,18 @@ Terrain* LoadTerrain(int Width,int Height,Texture2D TreeTex,Texture2D LakeTex){
     T = new Terrain[total+1];
     for(int i=0;i<TreeCount;i++){
         T[i].texture = TreeTex;
-        T[i].set_pos({float(GetRandomValue(0.33*Width,0.55*Width)),float(Height/3+50)});
-
+        T[i].set_pos({float(GetRandomValue(0.33*Width,0.55*Width)),float(Height/2-i*50)});
+        while(CheckCollisionsRectangles(PotPosition,T[i].get_pos())){
+            T[i].set_pos({float(GetRandomValue(0.33*Width,0.55*Width)),float(Height/2-i*50)});
+        }
         DrawTextureRec(T[i].texture,T[i].Recta,T[i].TerPos,WHITE);  
     }
     for(int i=TreeCount;i<total;i++){
         T[i].texture = LakeTex;
         T[i].set_pos({float(GetRandomValue(0.33*Width,0.55*Width)),float(Height/2-i*50)});
-
+        while(CheckCollisionsRectangles(PotPosition,T[i].get_pos())){
+            T[i].set_pos({float(GetRandomValue(0.33*Width,0.55*Width)),float(Height/2-i*50)});
+        }
         DrawTextureRec(T[i].texture,T[i].Recta,T[i].TerPos,WHITE);
     }
 
@@ -270,14 +276,13 @@ Terrain* LoadTerrain(int Width,int Height,Texture2D TreeTex,Texture2D LakeTex){
 Potion LoadPotion(int Width,int Height,Texture2D PotionTex,Game State){
     Rectangle frameRec={0.0f, 0.0f, 21.0f, 21.0f};
     int TerrainCount = sizeof(State.Terrains);
-    Vector2 SpritePosition={float(GetRandomValue(0.33*Width,0.55*Width)),float(Height/3+50)};
+    Vector2 SpritePosition={float(GetRandomValue(0.33*Width,0.55*Width)),float(GetRandomValue(0,Height/3+50))};
     Potion P;
-    for(int i = 0;i<TerrainCount;i++){
-        while(CheckCollisionsRectangles(SpritePosition,State.Terrains[i].TerPos) || 
-        CheckCollisionsRectangles(State.avatar.get_pos(),SpritePosition)){
-            SpritePosition = {float(GetRandomValue(0.33*Width,0.55*Width)),float(Height/3+50)};
+    /*for(int i = 0;i<TerrainCount;i++){
+        while(CheckCollisionsRectangles(SpritePosition,State.Terrains[i].TerPos)){
+            SpritePosition = {float(GetRandomValue(0.33*Width,0.55*Width)),float(GetRandomValue(0,Height/3+50))};
         }
-    }
+    }*/
     P.set_Tex(PotionTex);
     P.set_pos(SpritePosition);
     DrawTextureRec(PotionTex, frameRec, SpritePosition, WHITE);
@@ -576,8 +581,13 @@ void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* Vamp
         DrawTextureRec(State.potion.get_Tex(), {0.0f, 0.0f, 21.0f, 21.0f}, State.potion.get_pos(), WHITE);
     }
     else{
-        *PotionExistance = false;
-        *avatarsPot = *avatarsPot + 1;
+        if(*avatarsPot == 1 && *PotionExistance == true){
+            *PotionExistance = false;
+            *avatarsPot = 2;
+        }else if(*avatarsPot == 0 && *PotionExistance == true){
+            *PotionExistance = false;
+            *avatarsPot = 1;
+        }
     }
  
 }
@@ -655,10 +665,10 @@ void CreateWindow(int Width, int Height, const char* Team){
             PlayMusicStream(music);
         }
         if(FirstTime==true){
-            State.Terrains = LoadTerrain(Width,Height,TreeTexture,LakeTexture);
+            State.potion = LoadPotion(Width,Height,PotionTexture,State);
+            State.Terrains = LoadTerrain(Width,Height,TreeTexture,LakeTexture,State.potion.get_pos());
             State.Rectangles=LoadEntites(Width, Height, WerewolfTexture, VampireTexture);
             State.avatar=LoadAvatar(Width, Height, AvatarTexture, Team);
-            State.potion = LoadPotion(Width,Height,PotionTexture,State);
             FirstTime=false;
             State.PotionExistance = true;
             int count=(Width*Height)/(20*21*21);
