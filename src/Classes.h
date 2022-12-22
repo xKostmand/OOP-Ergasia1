@@ -265,6 +265,7 @@ class Game{
             this->vampire=V;
             this->werewolf=W;
             Time = 0;
+            Speed = 5.0;
         }
         Game(){}
 };

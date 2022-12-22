@@ -278,11 +278,6 @@ Potion LoadPotion(int Width,int Height,Texture2D PotionTex,Game State){
     int TerrainCount = sizeof(State.Terrains);
     Vector2 SpritePosition={float(GetRandomValue(0.33*Width,0.55*Width)),float(GetRandomValue(0,Height/3+50))};
     Potion P;
-    /*for(int i = 0;i<TerrainCount;i++){
-        while(CheckCollisionsRectangles(SpritePosition,State.Terrains[i].TerPos)){
-            SpritePosition = {float(GetRandomValue(0.33*Width,0.55*Width)),float(GetRandomValue(0,Height/3+50))};
-        }
-    }*/
     P.set_Tex(PotionTex);
     P.set_pos(SpritePosition);
     P.set_PotEx(true);
@@ -696,8 +691,6 @@ void CreateWindow(int Width, int Height, const char* Team){
             State.Terrains = LoadTerrain(Width,Height,TreeTexture,LakeTexture,State.potion.get_pos());
             State.Rectangles=LoadEntites(Width, Height, WerewolfTexture, VampireTexture);
             State.avatar=LoadAvatar(Width, Height, AvatarTexture, Team);
-            // State.PotionExistance = true;
-            State.Speed = 3.0;
             int count=(Width*Height)/(20*21*21);
             *State.vampire->get_num()=count;
             *State.werewolf->get_num()=count;

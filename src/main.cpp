@@ -34,8 +34,6 @@ int main(int argc, char** argv){
         string posY = to_string((int)x.get_y());
         const char* X = posX.c_str();
         const char* Y = posY.c_str();
-
-        int myWidth = GetMonitorWidth(0),myHeight = GetMonitorHeight(0);
         SetTargetFPS(60);
         BeginDrawing();
         ClearBackground(BLACK);
@@ -50,8 +48,6 @@ int main(int argc, char** argv){
             EndDrawing();
         }
         CloseWindow();
-        /*cout << "\n\n\n\nWrong inputs,window size must have scaling : \nWidth : "<<myWidth/4<<" - "<<
-        myWidth<<"\nHeight : " << myHeight/2<<" - "<<myHeight<<"\n";*/
         return -1;
     }
     int WindowWidth=atoi(argv[1]), WindowHeight=atoi(argv[2]);
