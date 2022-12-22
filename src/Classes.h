@@ -75,6 +75,7 @@ class Potion{
     private:
         Position position;
         Texture2D texture;
+        bool Existance;
     public:
         Potion(){}
         Potion(Position z):position(z){}
@@ -83,6 +84,12 @@ class Potion{
             pos.x = position.get_x();
             pos.y = position.get_y();
             return pos;
+        }
+        void set_PotEx(bool ex){
+            Existance = ex;
+        }
+        bool* DoesPotExist(){
+            return &Existance;
         }
         void set_pos(Vector2 pos){
             position.set_x(pos.x);
@@ -100,6 +107,7 @@ class Entity{
     protected:
         string name;
         int PotionCount;
+        int Number;
     public:
         int* potisource(){
             return &PotionCount;
@@ -180,6 +188,7 @@ class Werewolf: public Entity{
         void set_health(int x){
             Health=x;
         }
+        int* get_num(){return &Number;}
 };
 
 class Vampire: public Entity{
@@ -212,30 +221,31 @@ class Vampire: public Entity{
         void set_health(int x){
             Health=x;
         }
+        int* get_num(){return &Number;}
 };
 
 class Terrain{
-    public:
+    private:
         Texture2D texture;
         Vector2 TerPos;
-        Rectangle Recta;
         Color tint;
+    public:    
+        Rectangle Recta;
         Terrain(){
             tint = WHITE;
         }
         Color GetCol(){return tint;}
+        Texture GetTex(){return texture;}
+        void SetTex(Texture2D tex){texture = tex;}
         void SetCol(Color code){tint = code;}
-        Vector2 get_pos(){
+        Vector2 GetPos(){
             return TerPos;
         }
-        void set_pos(Vector2 z1){
+        void SetPos(Vector2 z1){
             TerPos=z1;
         }
 };
 
-
-typedef Terrain Lake;
-typedef Terrain Tree;
 
 class Game{
     public:
@@ -246,9 +256,6 @@ class Game{
         Potion potion;
         Terrain *Terrains;
         float Speed;
-        bool PotionExistance;
-        int WereCount;
-        int VampCount;
         int Time;
     public:
         Game(int Width, int Height){
@@ -257,9 +264,6 @@ class Game{
             Werewolf* W=new Werewolf[count];
             this->vampire=V;
             this->werewolf=W;
-            WereCount=count;
-            VampCount=count;
-            PotionExistance=true;
             Time = 0;
         }
         Game(){}

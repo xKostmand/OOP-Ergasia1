@@ -32,7 +32,7 @@ bool CheckCollisionsRectangles(Vector2 v1, Vector2 v2){
 
 bool CheckCollisionTerrain(Game State,int number, int type,int TreeNum){
     for(int j = 0 ; j < TreeNum ; j++){
-        if(CheckCollisionsRectangles(State.Rectangles[number][type].position,State.Terrains[j].TerPos))
+        if(CheckCollisionsRectangles(State.Rectangles[number][type].position,State.Terrains[j].GetPos()))
             return true;
         if(CheckCollisionsRectangles(State.Rectangles[number][type].position,State.potion.get_pos()))
             return true;
@@ -140,7 +140,7 @@ int CheckCollisions(Game State, int number, int count, int type, int CheckWithOt
                 if(CheckWithOther==1){
                     if(CheckCollisionsRectangles(State.Rectangles[number][0].position, State.Rectangles[i][1].position)){
                         if(!Spawning){
-                            Damage(State, number, i, &(State.WereCount), &(State.VampCount));
+                            Damage(State, number, i, State.werewolf->get_num(), State.vampire->get_num());
                         }
                         return 2;
                     }
@@ -149,7 +149,7 @@ int CheckCollisions(Game State, int number, int count, int type, int CheckWithOt
                 if(CheckWithOther==1){
                     if(CheckCollisionsRectangles(State.Rectangles[number][1].position, State.Rectangles[i][0].position)){
                         if(!Spawning){
-                            Damage(State, i, number, &(State.WereCount), &(State.VampCount));
+                            Damage(State, i, number, State.werewolf->get_num(), State.vampire->get_num());
                         }
                         return 2;
                     }
@@ -166,14 +166,14 @@ int CheckCollisions(Game State, int number, int count, int type, int CheckWithOt
                 if(type==0){
                     if(CheckCollisionsRectangles(State.Rectangles[number][0].position, State.Rectangles[i][1].position)){
                         if(!Spawning){
-                            Damage(State, number, i, &(State.WereCount), &(State.VampCount));
+                            Damage(State, number, i, State.werewolf->get_num(), State.vampire->get_num());
                         }
                         return 2;
                     }
                 }else if(type==1){
                     if(CheckCollisionsRectangles(State.Rectangles[number][1].position, State.Rectangles[i][0].position)){
                         if(!Spawning){
-                            Damage(State, i, number, &(State.WereCount), &(State.VampCount));
+                            Damage(State, i, number, State.werewolf->get_num(), State.vampire->get_num());
                         }
                         return 2;
                     }
@@ -253,20 +253,20 @@ Terrain* LoadTerrain(int Width,int Height,Texture2D TreeTex,Texture2D LakeTex, V
     Vector2 TerPosition;
     T = new Terrain[total+1];
     for(int i=0;i<TreeCount;i++){
-        T[i].texture = TreeTex;
-        T[i].set_pos({float(GetRandomValue(0.33*Width,0.55*Width)),float(Height/2-i*50)});
-        while(CheckCollisionsRectangles(PotPosition,T[i].get_pos())){
-            T[i].set_pos({float(GetRandomValue(0.33*Width,0.55*Width)),float(Height/2-i*50)});
+        T[i].SetTex(TreeTex);
+        T[i].SetPos({float(GetRandomValue(0.33*Width,0.55*Width)),float(Height/2-i*50)});
+        while(CheckCollisionsRectangles(PotPosition,T[i].GetPos())){
+            T[i].SetPos({float(GetRandomValue(0.33*Width,0.55*Width)),float(Height/2-i*50)});
         }
-        DrawTextureRec(T[i].texture,T[i].Recta,T[i].TerPos,WHITE);  
+        DrawTextureRec(T[i].GetTex(),T[i].Recta,T[i].GetPos(),WHITE);  
     }
     for(int i=TreeCount;i<total;i++){
-        T[i].texture = LakeTex;
-        T[i].set_pos({float(GetRandomValue(0.33*Width,0.55*Width)),float(Height/2-i*50)});
-        while(CheckCollisionsRectangles(PotPosition,T[i].get_pos())){
-            T[i].set_pos({float(GetRandomValue(0.33*Width,0.55*Width)),float(Height/2-i*50)});
+        T[i].SetTex(LakeTex);
+        T[i].SetPos({float(GetRandomValue(0.33*Width,0.55*Width)),float(Height/2-i*50)});
+        while(CheckCollisionsRectangles(PotPosition,T[i].GetPos())){
+            T[i].SetPos({float(GetRandomValue(0.33*Width,0.55*Width)),float(Height/2-i*50)});
         }
-        DrawTextureRec(T[i].texture,T[i].Recta,T[i].TerPos,WHITE);
+        DrawTextureRec(T[i].GetTex(),T[i].Recta,T[i].GetPos(),WHITE);
     }
 
 
@@ -285,6 +285,7 @@ Potion LoadPotion(int Width,int Height,Texture2D PotionTex,Game State){
     }*/
     P.set_Tex(PotionTex);
     P.set_pos(SpritePosition);
+    P.set_PotEx(true);
     DrawTextureRec(PotionTex, frameRec, SpritePosition, WHITE);
     return P;
 }
@@ -478,7 +479,7 @@ bool CheckAvatarCollisions(Game State, int count){
     }
     int TerrainCount = sizeof(State.Terrains);
     for(int i=0;i<TerrainCount;i++){
-        if(CheckCollisionsRectangles(State.avatar.get_pos(), State.Terrains[i].get_pos())){
+        if(CheckCollisionsRectangles(State.avatar.get_pos(), State.Terrains[i].GetPos())){
             return true;
         }
     }
@@ -570,7 +571,7 @@ void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* Vamp
     int count=(Width*Height)/(20*21*21);
     int TerrainCount = sizeof(State.Terrains);
     for(int i=0;i<TerrainCount;i++){
-        DrawTextureRec(State.Terrains[i].texture,{0.0f, 0.0f, 21.0f, 21.0f},State.Terrains[i].TerPos,WHITE);
+        DrawTextureRec(State.Terrains[i].GetTex(),{0.0f, 0.0f, 21.0f, 21.0f},State.Terrains[i].GetPos(),WHITE);
     }
     for(int i=0;i<count;i++){
         MoveWerewolves(State, Width, Height, i, count);
@@ -607,8 +608,8 @@ void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* Vamp
 }
 
 void PauseGame(Game State, int Width, int Height, bool* pause,bool* FirstTime,Music music){
-    string werecount = to_string((int)State.WereCount);
-    string vampcount = to_string((int)State.VampCount);
+    string werecount = to_string((int)*State.werewolf->get_num());
+    string vampcount = to_string((int)*State.vampire->get_num());
     string potionCount = to_string((int)State.avatar.get_pot());
     const char* wCount = werecount.c_str();
     const char* vCount = vampcount.c_str();
@@ -641,10 +642,15 @@ void PauseGame(Game State, int Width, int Height, bool* pause,bool* FirstTime,Mu
 }
 
 float VolumeCheck(float volume){
-    if(IsKeyDown(KEY_DOWN))volume = volume - 0.01;
-    if(IsKeyDown(KEY_UP))volume = volume + 0.01;
+    if(IsKeyPressed(KEY_DOWN))volume-=0.01;
+    if(IsKeyDown(KEY_DOWN))volume-=0.005;
+    if(IsKeyDown(KEY_UP))volume +=0.005;
+    if(IsKeyPressed(KEY_UP))volume+=0.01;
     if(IsKeyPressed(KEY_M))volume = 0.0;
-    return volume;
+    if(volume < 0.0)
+        return 0.0;
+    else        
+        return volume;
 }
 
 void EndGame(int Height,int Width,string winner){
@@ -658,7 +664,7 @@ void EndGame(int Height,int Width,string winner){
 }
 
 void CreateWindow(int Width, int Height, const char* Team){
-    float volume = 0.05;
+    float volume = 0.01;
     bool pause = false;
     bool FirstTime=true;
     Game State(Width, Height);
@@ -681,6 +687,7 @@ void CreateWindow(int Width, int Height, const char* Team){
     while(!WindowShouldClose()){
         BeginDrawing();
         ClearBackground(BLACK);
+        volume = VolumeCheck(volume);
         if(!IsMusicStreamPlaying(music)){
             PlayMusicStream(music);
         }
@@ -689,24 +696,24 @@ void CreateWindow(int Width, int Height, const char* Team){
             State.Terrains = LoadTerrain(Width,Height,TreeTexture,LakeTexture,State.potion.get_pos());
             State.Rectangles=LoadEntites(Width, Height, WerewolfTexture, VampireTexture);
             State.avatar=LoadAvatar(Width, Height, AvatarTexture, Team);
-            State.PotionExistance = true;
+            // State.PotionExistance = true;
             State.Speed = 3.0;
             int count=(Width*Height)/(20*21*21);
-            State.VampCount=count;
-            State.WereCount=count;
+            *State.vampire->get_num()=count;
+            *State.werewolf->get_num()=count;
             for(int i=0;i<count;i++){
                 State.werewolf[i].isDead=false;
                 State.vampire[i].isDead=false;
             }
             FirstTime=false;
         }
-        if(IsKeyPressed(KEY_P) && State.VampCount>0 & State.WereCount>0){
+        if(IsKeyPressed(KEY_P) && *State.vampire->get_num()>0 & *State.werewolf->get_num()>0){
             pause = !pause;
         }
         if(!pause){            
             UpdateMusicStream(music); SetMasterVolume(volume);
-            if(State.VampCount<=0 || State.WereCount<=0){
-                if(State.VampCount > State.WereCount){
+            if(*State.vampire->get_num()<=0 || *State.werewolf->get_num()<=0){
+                if(*State.vampire->get_num() > *State.werewolf->get_num()){
                     EndGame(Height,Width,"Vampires");
                     StopMusicStream(music);
                 }else{
@@ -727,14 +734,14 @@ void CreateWindow(int Width, int Height, const char* Team){
                 ResumeMusicStream(music);
                 DayNightCycle(&State.Time, Width, Height);
                 State.avatar.set_pos(UpdateAvatar(State,Width,Height,State.avatar.potisource(),&(State.Speed),HealSound));
-                UpdateEntities(State, Width, Height, &(State.WereCount), &(State.VampCount),&(State.PotionExistance),State.avatar.potisource(),PotionSound);
+                UpdateEntities(State, Width, Height, State.werewolf->get_num(), State.vampire->get_num(),State.potion.DoesPotExist(),State.avatar.potisource(),PotionSound);
                 DrawTextureRec(State.avatar.texture, {0.0f, 0.0f, 21.0f, 21.0f}, State.avatar.z, WHITE);
             }
         }else{
             PauseMusicStream(music);
             PauseGame(State, Width, Height, &pause,&FirstTime,music);    
         }
-        volume = VolumeCheck(volume);
+
         EndDrawing();
     }
     UnloadMusicStream(music);   // Unload music stream buffers from RAM
