@@ -249,6 +249,7 @@ class Game{
         bool PotionExistance;
         int WereCount;
         int VampCount;
+        int Time;
     public:
         Game(int Width, int Height){
             int count=(Width*Height)/(20*21*21);
@@ -259,6 +260,7 @@ class Game{
             WereCount=count;
             VampCount=count;
             PotionExistance=true;
+            Time = 0;
         }
         Game(){}
 };

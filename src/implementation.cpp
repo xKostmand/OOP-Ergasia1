@@ -544,11 +544,19 @@ Vector2 UpdateAvatar(Game State, int Width,int Height,int* PotCount,float* Speed
             type = 0;
         else
             type = 1;    
-        //heal and lower the Avatar's potion counter    
-        AOE_HEAL(Width,Height,State,type);
-        SetSoundVolume(Heal , 3.5);
-        PlaySound(Heal);
-        *PotCount = *PotCount - 1;
+        //heal and lower the Avatar's potion counter
+        if(State.Time>150 && State.Time<301 && type == 0){    
+            AOE_HEAL(Width,Height,State,type);
+            SetSoundVolume(Heal , 3.5);
+            PlaySound(Heal);
+            *PotCount = *PotCount - 1;
+        }
+        else if(State.Time>0 && State.Time<151 && type == 1){
+            AOE_HEAL(Width,Height,State,type);
+            SetSoundVolume(Heal , 3.5);
+            PlaySound(Heal);
+            *PotCount = *PotCount - 1;
+        }  
     }
     if(IsKeyPressed(KEY_PAGE_UP) && State.Speed < 9.5)
         *Speed += 1.0;
@@ -650,7 +658,7 @@ void EndGame(int Height,int Width,string winner){
 }
 
 void CreateWindow(int Width, int Height, const char* Team){
-    int time=0;float volume = 0.05;
+    float volume = 0.05;
     bool pause = false;
     bool FirstTime=true;
     Game State(Width, Height);
@@ -717,7 +725,7 @@ void CreateWindow(int Width, int Height, const char* Team){
                 }       
             }else{
                 ResumeMusicStream(music);
-                DayNightCycle(&time, Width, Height);
+                DayNightCycle(&State.Time, Width, Height);
                 State.avatar.set_pos(UpdateAvatar(State,Width,Height,State.avatar.potisource(),&(State.Speed),HealSound));
                 UpdateEntities(State, Width, Height, &(State.WereCount), &(State.VampCount),&(State.PotionExistance),State.avatar.potisource(),PotionSound);
                 DrawTextureRec(State.avatar.texture, {0.0f, 0.0f, 21.0f, 21.0f}, State.avatar.z, WHITE);
