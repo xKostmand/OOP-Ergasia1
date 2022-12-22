@@ -694,6 +694,7 @@ void CreateWindow(int Width, int Height, const char* Team){
             int count=(Width*Height)/(20*21*21);
             *State.vampire->get_num()=count;
             *State.werewolf->get_num()=count;
+            State.Speed=5.0;
             for(int i=0;i<count;i++){
                 State.werewolf[i].isDead=false;
                 State.vampire[i].isDead=false;
