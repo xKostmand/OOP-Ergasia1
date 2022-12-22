@@ -289,9 +289,9 @@ Avatar LoadAvatar(int Width, int Height, Texture2D AvatarTexture, const char* Te
     Rectangle frameRec={0.0f, 0.0f, 21.0f, 21.0f};
     Vector2 SpritePosition={float(Width/2), float(0.9*Height)};
     Avatar A;
-    A.Team=Team;
-    A.texture=AvatarTexture;
-    A.z=SpritePosition;
+    A.set_team(Team);
+    A.set_texture(AvatarTexture);
+    A.set_pos(SpritePosition);
     DrawTextureRec(AvatarTexture, frameRec, SpritePosition, WHITE);
     return A;
 }
@@ -502,37 +502,39 @@ void AOE_HEAL(int Width,int Height,Game State,int type){
 
 Vector2 UpdateAvatar(Game State, int Width,int Height,int* PotCount,float* Speed,Sound Heal){
     int count=(Width*Height)/(20*21*21);
-    int type ;
+    int type;
+    float avatarSpeed = (*Speed)*0.8;
+
     if (IsKeyDown(KEY_D)){
-        State.avatar.z.x +=State.Speed/2;
-        if(State.avatar.z.x>Width-21)
-            State.avatar.z.x -=State.Speed/2;
+        State.avatar.set_pos({State.avatar.get_pos().x+avatarSpeed,State.avatar.get_pos().y});
+        if(State.avatar.get_pos().x>Width-21)
+            State.avatar.set_pos({State.avatar.get_pos().x-avatarSpeed,State.avatar.get_pos().y});
         if(CheckAvatarCollisions(State,count)){
-            State.avatar.z.x -=State.Speed/2;
+            State.avatar.set_pos({State.avatar.get_pos().x-avatarSpeed,State.avatar.get_pos().y});
         }
     }
     if (IsKeyDown(KEY_A)){
-        State.avatar.z.x -=State.Speed/2;
-        if(State.avatar.z.x<0)
-            State.avatar.z.x +=State.Speed/2;
+        State.avatar.set_pos({State.avatar.get_pos().x-avatarSpeed,State.avatar.get_pos().y});
+        if(State.avatar.get_pos().x<0)
+            State.avatar.set_pos({State.avatar.get_pos().x+avatarSpeed,State.avatar.get_pos().y});
         if(CheckAvatarCollisions(State,count)){
-            State.avatar.z.x +=State.Speed/2;
+            State.avatar.set_pos({State.avatar.get_pos().x+avatarSpeed,State.avatar.get_pos().y});
         }
     }
     if (IsKeyDown(KEY_W)){
-        State.avatar.z.y -= State.Speed/2;
-        if(State.avatar.z.y<0)
-            State.avatar.z.y +=State.Speed/2;
+        State.avatar.set_pos({State.avatar.get_pos().x,State.avatar.get_pos().y-avatarSpeed});
+        if(State.avatar.get_pos().y<0)
+            State.avatar.set_pos({State.avatar.get_pos().x,State.avatar.get_pos().y+avatarSpeed});
         if(CheckAvatarCollisions(State,count)){
-            State.avatar.z.y +=State.Speed/2;
+            State.avatar.set_pos({State.avatar.get_pos().x,State.avatar.get_pos().y+avatarSpeed});
         }
     }
     if (IsKeyDown(KEY_S)){
-        State.avatar.z.y += State.Speed/2;
-        if(State.avatar.z.y>Height-21)
-            State.avatar.z.y -=State.Speed/2;
+        State.avatar.set_pos({State.avatar.get_pos().x,State.avatar.get_pos().y+avatarSpeed});
+        if(State.avatar.get_pos().y>Height-21)
+            State.avatar.set_pos({State.avatar.get_pos().x,State.avatar.get_pos().y-avatarSpeed});
         if(CheckAvatarCollisions(State,count)){
-            State.avatar.z.y -=State.Speed/2;
+            State.avatar.set_pos({State.avatar.get_pos().x,State.avatar.get_pos().y-avatarSpeed});
         }
     }
     if(IsKeyPressed(KEY_H) && *PotCount>0){
@@ -559,7 +561,7 @@ Vector2 UpdateAvatar(Game State, int Width,int Height,int* PotCount,float* Speed
     if(IsKeyPressed(KEY_PAGE_DOWN) && State.Speed > 1.5)
         *Speed -= 1.0;
 
-    return State.avatar.z;
+    return State.avatar.get_pos();
 }
 
 void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* VampCount,bool* PotionExistance,int* avatarsPot,Sound Pickup){
@@ -571,7 +573,7 @@ void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* Vamp
     for(int i=0;i<count;i++){
         MoveWerewolves(State, Width, Height, i, count);
         MoveVampires(State, Width, Height, i, count);
-        DrawTextureRec(State.avatar.texture, {0.0f, 0.0f, 21.0f, 21.0f}, State.avatar.z, WHITE);
+        DrawTextureRec(State.avatar.get_texture(), {0.0f, 0.0f, 21.0f, 21.0f}, State.avatar.get_pos(), WHITE);
         if(State.werewolf[i].get_health()>0){
             DrawTextureRec(State.Rectangles[i][0].texture, State.Rectangles[i][0].source, State.Rectangles[i][0].position, State.Rectangles[i][0].tint);
         }else if(State.werewolf[i].isDead==false){
@@ -585,7 +587,7 @@ void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* Vamp
             State.vampire[i].isDead=true;
         }
     }
-    if(!CheckCollisionsRectangles(State.avatar.z,State.potion.get_pos()) && *PotionExistance == true){
+    if(!CheckCollisionsRectangles(State.avatar.get_pos(),State.potion.get_pos()) && *PotionExistance == true){
         DrawTextureRec(State.potion.get_Tex(), {0.0f, 0.0f, 21.0f, 21.0f}, State.potion.get_pos(), WHITE);
     }
     else{
@@ -729,7 +731,7 @@ void CreateWindow(int Width, int Height, const char* Team){
                 DayNightCycle(&State.Time, Width, Height);
                 State.avatar.set_pos(UpdateAvatar(State,Width,Height,State.avatar.potisource(),&(State.Speed),HealSound));
                 UpdateEntities(State, Width, Height, State.werewolf->get_num(), State.vampire->get_num(),State.potion.DoesPotExist(),State.avatar.potisource(),PotionSound);
-                DrawTextureRec(State.avatar.texture, {0.0f, 0.0f, 21.0f, 21.0f}, State.avatar.z, WHITE);
+                DrawTextureRec(State.avatar.get_texture(), {0.0f, 0.0f, 21.0f, 21.0f}, State.avatar.get_pos(), WHITE);
             }
         }else{
             PauseMusicStream(music);

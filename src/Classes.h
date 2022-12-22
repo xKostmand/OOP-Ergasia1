@@ -128,7 +128,7 @@ class Entity{
 };
 
 class Avatar: public Entity{
-    public:
+    private:
         const char* Team;
         Texture2D texture;
         Vector2 z;
