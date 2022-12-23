@@ -144,6 +144,9 @@ class Entity{
         void usepotion(){
             PotionCount--;
         }
+        void set_num(int num){
+            Number=num;
+        }
         
 };
 
@@ -205,8 +208,11 @@ class Werewolf: public Entity{
         void healup(){
             Health++;
         }
-        void set_health(int x){
+        void add_health(int x){
             Health=Health + x;
+        }
+        void set_health(int x){
+            Health=x;
         }
         int* get_num(){return &Number;}
 };
@@ -238,8 +244,11 @@ class Vampire: public Entity{
         void healup(){
             Health++;
         }
-        void set_health(int x){
+        void add_health(int x){
             Health=Health + x;
+        }
+        void set_health(int x){
+            Health=x;
         }
         int* get_num(){return &Number;}
 };

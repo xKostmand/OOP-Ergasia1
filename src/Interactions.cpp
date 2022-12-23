@@ -144,14 +144,14 @@ void AOE_HEAL(int Width,int Height,Game State,int type){
     if(type == 0){
         for(int i = 0;i<count ;i++){
             if(State.werewolf[i].get_health()>0){
-                State.werewolf[i].set_health(3);
+                State.werewolf[i].add_health(3);
             }
         }
     }
     else{
         for(int i = 0;i<count ;i++){
             if(State.vampire[i].get_health()>0){
-                State.vampire[i].set_health(3);
+                State.vampire[i].add_health(3);
             }
         }
     }

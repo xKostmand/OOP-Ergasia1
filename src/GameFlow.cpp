@@ -100,8 +100,9 @@ void CreateWindow(int Width, int Height, const char* Team){
             State.Rectangles=LoadEntites(Width, Height, WerewolfTexture, VampireTexture);
             State.avatar=LoadAvatar(Width, Height, AvatarTexture, Team);
             int count=(Width*Height)/(20*21*21);
-            *State.vampire->get_num()=count;
-            *State.werewolf->get_num()=count;
+            State.vampire->set_num(count);
+            State.werewolf->set_num(count);
+            //*State.werewolf->get_num()=count;
             State.Speed=5.0;
             for(int i=0;i<count;i++){
                 State.werewolf[i].isDead=false;
@@ -146,9 +147,10 @@ void CreateWindow(int Width, int Height, const char* Team){
 
         EndDrawing();
     }
+    UnloadSound(PotionSound);
+    UnloadSound(HealSound);
     UnloadMusicStream(music);   // Unload music stream buffers from RAM
     CloseAudioDevice();         // Close audio device (music streaming is automatically stopped)
-    CloseAudioDevice(); 
     CloseWindow();
     DeallocateMem(State, (Width*Height)/(20*21*21));
 }
