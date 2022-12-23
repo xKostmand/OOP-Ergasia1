@@ -5,7 +5,6 @@
 #include <limits>
 #include "../include/raylib.h"
 #include "../include/raymath.h"
-#include "implementation.h"
 
 using namespace std;
 
@@ -34,12 +33,19 @@ class Position{
 };
 
 class Rec{
-    public:
+    private:
         Texture2D texture;
         Rectangle source;
         Vector2 position;
         Color tint;
-/*    public:
+    public:
+        Rec(Texture2D T, Rectangle R, Vector2 P, Color Ti){
+            texture=T;
+            source=R;
+            position=P;
+            tint=Ti;
+        }
+        Rec(){}
         Texture2D get_texture(){
             return texture;
         }
@@ -58,7 +64,21 @@ class Rec{
         float get_y(){
             return position.y;
         }
-        */
+        void setpos(Vector2 pos){
+            position=pos;
+        }
+        void setx(float x1){
+            position.x=position.x + x1;
+        }
+        void sety(float y1){
+            position.y=position.y + y1;
+        }
+        void setx(int x1){
+            position.x=x1;
+        }
+        void sety(int y1){
+            position.y=y1;
+        }
 };
 
 class Textures{
@@ -186,7 +206,7 @@ class Werewolf: public Entity{
             Health++;
         }
         void set_health(int x){
-            Health=x;
+            Health=Health + x;
         }
         int* get_num(){return &Number;}
 };
@@ -219,7 +239,7 @@ class Vampire: public Entity{
             Health++;
         }
         void set_health(int x){
-            Health=x;
+            Health=Health + x;
         }
         int* get_num(){return &Number;}
 };

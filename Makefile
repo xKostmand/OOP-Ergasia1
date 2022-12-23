@@ -4,13 +4,16 @@ LDFLAGS=-L lib -static -static-libgcc -static-libstdc++
 LDLIBS=-lraylib -lopengl32 -lgdi32 -lwinmm
 
 #add all .o files here
-main: src/main.o src/implementation.o
+main: src/Main.o src/Implementation.o src/Load.o src/Interactions.o src/GameFlow.o
 		$(CXX) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 #add all .o files than need local .h files
-src/implementation.o: src/Classes.h
-src/main.o: src/Classes.h
+src/Implementation.o: src/Functions.h
+src/Interactions.o: src/Functions.h
+src/Load.o: src/Functions.h
+src/GameFlow: src/Functions.h
+src/Main.o: src/Classes.h
 
 .PHONY: clean
 clean:
-		rm -f src/main.o src/implementation.o
+		rm -f main.exe src/Main.o src/Implementation.o src/Load.o src/Interactions.o src/GameFlow.o
