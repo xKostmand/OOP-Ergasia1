@@ -16,4 +16,4 @@ src/Main.o: src/Classes.h
 
 .PHONY: clean
 clean:
-		rm -f main.exe src/Main.o src/Implementation.o src/Load.o src/Interactions.o src/GameFlow.o
+		rm -f src/Main.o src/Implementation.o src/Load.o src/Interactions.o src/GameFlow.o

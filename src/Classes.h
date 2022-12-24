@@ -258,8 +258,7 @@ class Terrain{
         Texture2D texture;
         Vector2 TerPos;
         Color tint;
-    public:    
-        Rectangle Recta;
+    public:
         Terrain(){
             tint = WHITE;
         }

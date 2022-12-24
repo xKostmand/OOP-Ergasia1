@@ -1,6 +1,6 @@
 #include "Functions.h"
 
-void MoveWerewolves(Game State, int Width,int Height, int i, int count){
+void MoveWerewolves(Game State, int Width,int Height, int i, int count){        //moves a werewolf entity using the GetRandomValue(int x, int y) functions that returns a int number in [x,y]
     int z1=GetRandomValue(1,4);     //1=move right, 2=move left, 3=move up, 4=move down
     int TerrainCount = sizeof(State.Terrains);
     switch(z1){
@@ -8,8 +8,8 @@ void MoveWerewolves(Game State, int Width,int Height, int i, int count){
             State.Rectangles[i][0].setx(State.Speed);
             if(State.Rectangles[i][0].get_x()>Width-21 && State.Rectangles[i][0].get_x()<Width+100)
                 State.Rectangles[i][0].setx(Width - 21);
-            if(CheckCollisions(State,i,count,0,1,0)){
-                State.Rectangles[i][0].setx(-State.Speed);
+            if(CheckCollisions(State,i,count,0,1,0)){               //if by moving it collided with somehting "rewind" its movement and continue
+                State.Rectangles[i][0].setx(-State.Speed);          //same in other cases and with vampires(just with more cases)
             }
             else if(CheckCollisionTerrain(State,i,0,TerrainCount)){
                 State.Rectangles[i][0].setx(-State.Speed);
@@ -161,8 +161,8 @@ void MoveVampires(Game State, int Width,int Height, int i, int count){
                 State.Rectangles[i][1].sety(-State.Speed);
             }
             else if(CheckCollisionTerrain(State,i,1,TerrainCount)){
-                State.Rectangles[i][1].setx(State.Speed*2);
-                State.Rectangles[i][1].sety(-State.Speed*2);
+                State.Rectangles[i][1].setx(State.Speed);
+                State.Rectangles[i][1].sety(-State.Speed);
             }
             break;
         default:
@@ -170,7 +170,7 @@ void MoveVampires(Game State, int Width,int Height, int i, int count){
     }
 }
 
-Vector2 UpdateAvatar(Game State, int Width,int Height,int* PotCount,float* Speed,Sound Heal){
+Vector2 UpdateAvatar(Game State, int Width,int Height,int* PotCount,float* Speed,Sound Heal){       //controls all avatar features(movement, heal team)
     int count=(Width*Height)/(20*21*21);
     int type;
     float avatarSpeed = (*Speed)*0.8;
@@ -213,8 +213,8 @@ Vector2 UpdateAvatar(Game State, int Width,int Height,int* PotCount,float* Speed
         else
             type = 1;    
         //heal and lower the Avatar's potion counter
-        if(State.Time>150 && State.Time<301 && type == 0){    
-            AOE_HEAL(Width,Height,State,type);
+        if(State.Time>150 && State.Time<301 && type == 0){    //heal avatar's team only if its the correct time
+            AOE_HEAL(Width,Height,State,type);                //0-150=day, 151-300=night
             SetSoundVolume(Heal , 3.5);
             PlaySound(Heal);
             *PotCount = *PotCount - 1;
@@ -226,7 +226,7 @@ Vector2 UpdateAvatar(Game State, int Width,int Height,int* PotCount,float* Speed
             *PotCount = *PotCount - 1;
         }  
     }
-    if(IsKeyPressed(KEY_PAGE_UP) && State.Speed < 9.5)
+    if(IsKeyPressed(KEY_PAGE_UP) && State.Speed < 9.5)          //by pressing these buttons it increases/decreases the speed in which the entities move
         *Speed += 1.0;
     if(IsKeyPressed(KEY_PAGE_DOWN) && State.Speed > 1.5)
         *Speed -= 1.0;
@@ -234,18 +234,18 @@ Vector2 UpdateAvatar(Game State, int Width,int Height,int* PotCount,float* Speed
     return State.avatar.get_pos();
 }
 
-void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* VampCount,bool* PotionExistance,int* avatarsPot,Sound Pickup){
+void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* VampCount,bool* PotionExistance,int* avatarsPot,Sound Pickup){      //updates ALL entites and draws them in our window
     int count=(Width*Height)/(20*21*21);
     int TerrainCount = sizeof(State.Terrains);
     for(int i=0;i<TerrainCount;i++){
-        DrawTextureRec(State.Terrains[i].GetTex(),{0.0f, 0.0f, 21.0f, 21.0f},State.Terrains[i].GetPos(),WHITE);
-    }
+        DrawTextureRec(State.Terrains[i].GetTex(),{0.0f, 0.0f, 21.0f, 21.0f},State.Terrains[i].GetPos(),WHITE);     //raylib function which draws in our window
+    }                                                                                                               //using the specified texture, rectangle from the asset, position and color
     for(int i=0;i<count;i++){
         MoveWerewolves(State, Width, Height, i, count);
         MoveVampires(State, Width, Height, i, count);
         DrawTextureRec(State.avatar.get_texture(), {0.0f, 0.0f, 21.0f, 21.0f}, State.avatar.get_pos(), WHITE);
         if(State.werewolf[i].get_health()>0){
-            DrawTextureRec(State.Rectangles[i][0].get_texture(), State.Rectangles[i][0].get_rect(), State.Rectangles[i][0].get_pos(), State.Rectangles[i][0].get_tint());
+            DrawTextureRec(State.Rectangles[i][0].get_texture(), State.Rectangles[i][0].get_rect(), State.Rectangles[i][0].get_pos(), State.Rectangles[i][0].get_tint());       //only draw entities if their hp is >0
         }else if(State.werewolf[i].isDead==false){
             (*WereCount)--;
             State.werewolf[i].isDead=true;
@@ -257,7 +257,7 @@ void UpdateEntities(Game State, int Width, int Height, int* WereCount, int* Vamp
             State.vampire[i].isDead=true;
         }
     }
-    if(!CheckCollisionsRectangles(State.avatar.get_pos(),State.potion.get_pos()) && *PotionExistance == true){
+    if(!CheckCollisionsRectangles(State.avatar.get_pos(),State.potion.get_pos()) && *PotionExistance == true){      //only draw potion if avatar hasnt picked it up
         DrawTextureRec(State.potion.get_Tex(), {0.0f, 0.0f, 21.0f, 21.0f}, State.potion.get_pos(), WHITE);
     }
     else{
