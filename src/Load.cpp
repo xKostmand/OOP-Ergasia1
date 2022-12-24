@@ -1,6 +1,7 @@
 #include "Functions.h"
 
-Textures LoadTextures(const char* Team){            //loads all of the required textures and stores them in the Textures class
+//loads all of the required textures and stores them in the Textures class
+Textures LoadTextures(const char* Team){            
     const char *Werewolves="assets/Images/Werewolves.png";
     const char *Vampires="assets/Images/Vampires.png";
     const char *Avatar1="assets/Images/AvatarVamp.png";
@@ -23,8 +24,10 @@ Textures LoadTextures(const char* Team){            //loads all of the required 
     return {WerewolfSprite, VampireSprite,AvatarSprite,TreeSprite,LakeSprite,PotionSprite};
 }
 
-Rec** LoadEntites(int Width, int Height, Texture2D WT, Texture2D VT){       //initializes all entities from both teams at a random location in their specified location(werewolves left, vampires right)
-    SetRandomSeed(time(NULL));                                              //Rec**: top row=for werewolves, bottom row=for vampires
+//initializes all entities from both teams at a random location in their specified location(werewolves left, vampires right)
+//Rec**: top row=for werewolves, bottom row=for vampires
+Rec** LoadEntites(int Width, int Height, Texture2D WT, Texture2D VT){       
+    SetRandomSeed(time(NULL));      
     Vector2 WerewolfSpritePosition,VampireSpritePosition;
     int count=(Width*Height)/(20*21*21);
     Game State;
@@ -50,12 +53,14 @@ Rec** LoadEntites(int Width, int Height, Texture2D WT, Texture2D VT){       //in
     }
     return State.Rectangles;
 }
-
+//Initializes the terrain (Water/Trees) and stores them in a table with Terrains
 Terrain* LoadTerrain(int Width,int Height,Texture2D TreeTex,Texture2D LakeTex, Vector2 PotPosition){
     Rectangle frameRec={0.0, 0.0, 21.0, 21.0};
     int TreeCount;
     int LakeCount;
     int total = 0;
+    //For Heights < 750 we create a total of 4 Terrains(2 Lakes/2 Trees)
+    //For Heights > 750 we create a total of 8 Terrains(4 Lakes/4 Trees)
     if(Height<750){
         TreeCount = 2;LakeCount = 2;total = 4;
     }
@@ -66,6 +71,9 @@ Terrain* LoadTerrain(int Width,int Height,Texture2D TreeTex,Texture2D LakeTex, V
     bool check = false;
     Vector2 TerPosition;
     T = new Terrain[total+1];
+    //for every member of the Terrain Table we set the Texture and we choose a 
+    //random position Checking for Collision with the Potion every time
+    //We skip the collision with each other using specific spacing for each Terrain Entity
     for(int i=0;i<TreeCount;i++){
         T[i].SetTex(TreeTex);
         T[i].SetPos({float(GetRandomValue(0.33*Width,0.55*Width)),float(Height/2-i*50)});
@@ -83,14 +91,16 @@ Terrain* LoadTerrain(int Width,int Height,Texture2D TreeTex,Texture2D LakeTex, V
         DrawTextureRec(T[i].GetTex(),{0.0,0.0,21.0,21.0},T[i].GetPos(),WHITE);
     }
 
-
+    //We return the position of the table which we want in the Game Class
     return T;
 }
 
+//Initializes the Potion Entity (texture, position, Draw)
 Potion LoadPotion(int Width,int Height,Texture2D PotionTex,Game State){     
     Rectangle frameRec={0.0f, 0.0f, 21.0f, 21.0f};
     int TerrainCount = sizeof(State.Terrains);
     Vector2 SpritePosition={float(GetRandomValue(0.33*Width,0.55*Width)),float(GetRandomValue(0,Height/3+50))};
+    //We create a temporary Potion Variable that we later return and store in the Game Class
     Potion P;
     P.set_Tex(PotionTex);
     P.set_pos(SpritePosition);
@@ -98,10 +108,11 @@ Potion LoadPotion(int Width,int Height,Texture2D PotionTex,Game State){
     DrawTextureRec(PotionTex, frameRec, SpritePosition, WHITE);
     return P;
 }
-
+//Initializes the Avatar Entity (Texture,start position, Draw)
 Avatar LoadAvatar(int Width, int Height, Texture2D AvatarTexture, const char* Team){
     Rectangle frameRec={0.0f, 0.0f, 21.0f, 21.0f};
     Vector2 SpritePosition={float(Width/2), float(0.9*Height)};
+    //We create a temporary Potion Variable that we later return and store in the Game Class
     Avatar A;
     A.set_team(Team);
     A.set_texture(AvatarTexture);

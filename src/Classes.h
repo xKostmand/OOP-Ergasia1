@@ -10,6 +10,8 @@ using namespace std;
 
 #define INF std::numeric_limits<float>::infinity()
 
+//This is a class created to save up space/time in other Classes(It is similar to Vector2)
+//We implement methods to set and get the x,y values from the private part of the class.
 class Position{
     private:
         float x;
@@ -32,6 +34,9 @@ class Position{
         }
 };
 
+//This is a class containing all the necessary information for our Rectangle entities with Textures
+//It stores the image,Rectangle{x,y,width,height},Position(Vector2) and Color drawn.
+//We implement once again the methods for accessing the private parts of the class Rec.
 class Rec{
     private:
         Texture2D texture;
@@ -81,6 +86,7 @@ class Rec{
         }
 };
 
+//This class stores our Image Textures of each entity
 class Textures{
     public:
         Texture2D T1;
@@ -91,6 +97,11 @@ class Textures{
         Texture2D T6;
 };
 
+/*The potion class contains a default constractor , the private informations and
+of course the methods in order to access them
+The bool variable Existance ensures that the Potion entity exists in the Game 
+It gets initialized as true in the LoadPotion section and we set it to false when
+our avatar collects the potion from the map(When he collided with it)*/
 class Potion{
     private:
         Position position;
@@ -123,6 +134,10 @@ class Potion{
         }
 };
 
+/*The Entity class contains the private informations and the methods in order to access them
+The variable PotionCount refers to the Potions that Both Werewolves and Vampires have and they
+use on their allies. The Number refers to the number of Werewolves/Vampires existing in each frame
+in our Game.*/
 class Entity{
     protected:
         string name;
@@ -130,6 +145,9 @@ class Entity{
         int Number;
     public:
         int* potisource(){
+            //The Potion source refers to the position of the variable Potion Count and 
+            //we use it to access and change the PotionCounter of our Entity -> avatar.
+            //Similar to usepotion but with pointers because we want to modify it in a different function.
             return &PotionCount;
         }
         string get_name(){
@@ -150,6 +168,8 @@ class Entity{
         
 };
 
+/*Class avatar contains the position,Team name and Texture of our avatar
+The informations are private and can be accessed with our methods*/
 class Avatar: public Entity{
     private:
         const char* Team;
@@ -157,6 +177,7 @@ class Avatar: public Entity{
         Vector2 z;
 
     public:
+        //Default Constructor for the Class Avatar
         Avatar(){
             name="Avatar";
             PotionCount = 1;
@@ -181,6 +202,10 @@ class Avatar: public Entity{
         }
 };
 
+/*Class Werewolf contains the Health,Damage and Defense of each Werewolf
+The informations are private and can be accessed with our methods.We also have 
+a public bool variable isDead to keep track of the dead Entities both for Werewolves and
+Vampires*/
 class Werewolf: public Entity{
     private:
         int Health;
@@ -188,6 +213,7 @@ class Werewolf: public Entity{
         int Defense;
     public:
         bool isDead;
+        //Default Constructor randomizing the Damage and defense of our entities
         Werewolf(){
             name="Werewolf";
             PotionCount=GetRandomValue(0,2);
@@ -214,9 +240,16 @@ class Werewolf: public Entity{
         void set_health(int x){
             Health=x;
         }
-        int* get_num(){return &Number;}
+        //returns the position of the Number variable so we can modify and display it in different Functions
+        int* get_num(){
+            return &Number;
+        }
 };
 
+/*Class Vampire contains the Health,Damage and Defense of each Werewolf
+The informations are private and can be accessed with our methods.We also have 
+a public bool variable isDead to keep track of the dead Entities both for Werewolves and
+Vampires*/
 class Vampire: public Entity{
     private:
         int Health;
@@ -224,6 +257,7 @@ class Vampire: public Entity{
         int Defense;
     public:
         bool isDead;
+        //Default Constructor randomizing the Damage and defense of our entities
         Vampire(){
             name="Vampire";
             PotionCount=GetRandomValue(0,2);
@@ -250,9 +284,15 @@ class Vampire: public Entity{
         void set_health(int x){
             Health=x;
         }
-        int* get_num(){return &Number;}
+        //returns the position of the Number variable so we can modify and display it in different Functions
+        int* get_num(){
+            return &Number;
+        }
 };
 
+/*Class terrain contains private informations Texture(image),Position and Color for our Terrains.Of course 
+we have our Default Constructor and the methods to access everything.
+*/
 class Terrain{
     private:
         Texture2D texture;
@@ -262,10 +302,18 @@ class Terrain{
         Terrain(){
             tint = WHITE;
         }
-        Color GetCol(){return tint;}
-        Texture GetTex(){return texture;}
-        void SetTex(Texture2D tex){texture = tex;}
-        void SetCol(Color code){tint = code;}
+        Color GetCol(){
+            return tint;
+        }
+        Texture GetTex(){
+            return texture;
+        }
+        void SetTex(Texture2D tex){
+            texture = tex;
+        }
+        void SetCol(Color code){
+            tint = code;
+        }
         Vector2 GetPos(){
             return TerPos;
         }
@@ -274,7 +322,10 @@ class Terrain{
         }
 };
 
-
+/*The Class Game is the most important one , here we store everything we need for our game.
+Rectangles is a "Matrix" containing both Werewolves and Vampires in the form of Recs.With the Rectangles
+we can access and change the position etc. of the entities.*/
+//werewolf/vampire are "tables" containing the health etc of each entity so our code is more readable and easier to understand and change
 class Game{
     public:
         Rec** Rectangles;
@@ -283,9 +334,10 @@ class Game{
         Vampire* vampire;
         Potion potion;
         Terrain *Terrains;
-        float Speed;
-        int Time;
+        float Speed; //speed of our game meaning the pixels which the entities move(max 10)
+        int Time; //Time of the day used in the Avatar Healing
     public:
+    //Secondary constructor with specific Width and Height used in the beginning of Create Window
         Game(int Width, int Height){
             int count=(Width*Height)/(20*21*21);
             Vampire* V=new Vampire[count];
@@ -295,5 +347,6 @@ class Game{
             Time = 0;
             Speed = 5.0;
         }
+        //Default Constructor for the Game class
         Game(){}
 };
